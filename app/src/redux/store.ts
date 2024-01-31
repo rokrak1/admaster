@@ -9,6 +9,7 @@ import stageDataReducer, { StageData, stageDataEpic } from "./currentStageData";
 import stageDataListReducer, { StageDataListItem } from "./StageDataList";
 import imageAssetListReducer, { ImageAssetListItem } from "./imageAssetList";
 import dataFeedReducer, { DataFeed } from "./dataFeed";
+import modalsReducer, { Modals } from "./modals";
 
 export type StoreState = {
   fileMeta: FileMeta;
@@ -16,6 +17,7 @@ export type StoreState = {
   stageDataList: EntityState<StageDataListItem>;
   imageAssetList: EntityState<ImageAssetListItem>;
   dataFeed: DataFeed;
+  modals: Modals;
 };
 
 const epicMiddleware = createEpicMiddleware();
@@ -30,6 +32,7 @@ const configureKonvaEditorStore = (preloadedState?: StoreState) => {
       stageDataList: stageDataListReducer,
       imageAssetList: imageAssetListReducer,
       dataFeed: dataFeedReducer,
+      modals: modalsReducer,
     },
     middleware: getDefaultMiddleware({ serializableCheck: false }).concat(
       epicMiddleware

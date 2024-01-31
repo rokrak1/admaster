@@ -13,6 +13,7 @@ import base64
 import httpx
 import random
 import copy
+import time
 
 class JsonData(BaseModel):
     # Define the structure of your JSON data here
@@ -62,14 +63,23 @@ async def fetch_image(url):
     }
 
     async with httpx.AsyncClient(follow_redirects=True) as client:
+        start_time = time.perf_counter()  # Start the timer
+
         try:
             response = await client.get(url, headers=headers)
             response.raise_for_status()  # Will raise an HTTPError for unsuccessful status codes
+            
+            end_time = time.perf_counter()  # End the timer
+            print(f"Request completed in {end_time - start_time:.2f} seconds")  # Print the time taken
+
             return response.content
         except httpx.HTTPError as e:
             print(f"HTTP error occurred: {e}")
         except Exception as e:
             print(f"An error occurred: {e}")
+
+        end_time = time.perf_counter()  # End the timer even in case of an exception
+        print(f"Request completed in {end_time - start_time:.2f} seconds")  # Print the time taken
 
     return None
 
