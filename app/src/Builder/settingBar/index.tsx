@@ -22,7 +22,9 @@ export type SettingBarProps = {
 };
 
 const Widgets = {
-  colorPalette: (data: WidgetKind & SettingBarProps) => <ColorPaletteWidget data={data} />,
+  colorPalette: (data: WidgetKind & SettingBarProps) => (
+    <ColorPaletteWidget data={data} />
+  ),
   align: (data: WidgetKind & SettingBarProps) => <AlignWidget data={data} />,
   image: (data: WidgetKind & SettingBarProps) => <ImageWidget />,
   frame: (data: WidgetKind & SettingBarProps) => <FrameWidget />,

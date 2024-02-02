@@ -25,51 +25,17 @@ const Layout: React.FC<LayoutProps> = ({
 }) => (
   <Container
     fluid
-    className={[sizeStyles.height100, overflowStyles.hide].join(" ")}
+    className={[sizeStyles.height100, overflowStyles.hide].join(" ") + " p-0"}
   >
-    <Row>
-      <Logo color="white" />
-    </Row>
-    {/*  
-  Uncomment to enable multiple Tabs
- <Row
-      xs={12}
-      className={[
-        sizeStyles.height5,
-        positionStyles.relative,
-        positionStyles.zIndex1,
-        spaceStyles.mt1rem,
-      ].join(" ")}>
-      {header}
-    </Row> */}
+    {navBar}
     <Row
       xs={12}
       className={[
-        sizeStyles.height90,
+        sizeStyles.height100,
         positionStyles.relative,
         positionStyles.zIndex1,
       ].join(" ")}
     >
-      <Col
-        xs="auto"
-        className={[
-          colorStyles.darkTheme,
-          sizeStyles.widthLogo,
-          sizeStyles.height100,
-          alignStyles.fromTopCenter,
-        ].join(" ")}
-      >
-        {navBar}
-      </Col>
-      <Col
-        className={[
-          "h-100",
-          positionStyles.relative,
-          colorStyles.greyTheme,
-        ].join(" ")}
-      >
-        {children}
-      </Col>
       <Col
         xs={2}
         className={[
@@ -81,8 +47,18 @@ const Layout: React.FC<LayoutProps> = ({
       >
         {settingBar}
       </Col>
+      <Col
+        className={[
+          sizeStyles.height100,
+          positionStyles.relative,
+          colorStyles.greyTheme,
+          positionStyles.zIndex1,
+        ].join(" ")}
+      >
+        {children}
+      </Col>
     </Row>
-    <Row
+    {/*     <Row
       xs={12}
       className={[
         colorStyles.darkTheme,
@@ -92,7 +68,7 @@ const Layout: React.FC<LayoutProps> = ({
       ].join(" ")}
     >
       {footer}
-    </Row>
+    </Row> */}
   </Container>
 );
 

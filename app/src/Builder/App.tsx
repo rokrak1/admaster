@@ -33,6 +33,7 @@ import useHotkeyFunc from "./hook/useHotkeyFunc";
 import useWorkHistory from "./hook/useWorkHistory";
 import useI18n from "./hook/usei18n";
 import { initialStageDataList } from "../redux/initilaStageDataList";
+import Navigation from "./Navigation/Navigation";
 
 export type FileKind = {
   "file-id": string;
@@ -131,7 +132,7 @@ function App() {
   );
 
   const navBar = (
-    <NavBar>
+    /*    <NavBar>
       {workModeList.map((data) => (
         <NavBarButton
           key={`navbar-${data.id}`}
@@ -140,7 +141,8 @@ function App() {
           onClick={getClickCallback(data.id)}
         />
       ))}
-    </NavBar>
+    </NavBar> */
+    <Navigation data={workModeList} onClick={getClickCallback} />
   );
 
   const hotkeyModal = (

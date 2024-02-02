@@ -5,6 +5,7 @@ import Papa from "papaparse";
 import { StoreState } from "../redux/store";
 import TemplatePreview from "./TemplatePreview/TemplatePreview";
 import { useState } from "react";
+import Navigation from "./Navigation/Navigation";
 
 const AppWrapper = () => {
   const dispatch = useDispatch();
@@ -55,14 +56,14 @@ const AppWrapper = () => {
 
   console.log("dataFeedTemplatePreviewImages:", dataFeedTemplatePreviewImages);
   return (
-    <div className="w-full h-full">
-      <input type="file" accept=".csv" onChange={onFileChange} />
+    <div className="w-full h-full bg-[#EDF2F7]">
+      {/*  <input type="file" accept=".csv" onChange={onFileChange} />
       <button
         className="p-3 bg-blue-200"
         onClick={() => setPreviewOpened(!previewOpened)}
       >
         OPEN
-      </button>
+      </button> */}
       <App />
       {dataFeedTemplatePreviewImages.length && previewOpened && (
         <TemplatePreview

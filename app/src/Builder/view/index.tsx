@@ -75,6 +75,40 @@ const View: React.FC<ViewProps> = ({
     setValue(STAGE_POSITION, newPos);
   }, []);
 
+  const moveOnWheel = useCallback((e: KonvaEventObject<WheelEvent>) => {
+    e.evt.preventDefault();
+    const stage = stageRef.current;
+    if (!stage) {
+      return;
+    }
+
+    // Increase the moveAmount for faster movement
+    const moveAmount = 50; // This controls the speed of the movement
+
+    // Calculate the new position based on the scroll direction
+    const moveX =
+      e.evt.deltaX > 0 ? moveAmount : e.evt.deltaX < 0 ? -moveAmount : 0;
+    const moveY =
+      e.evt.deltaY > 0 ? moveAmount : e.evt.deltaY < 0 ? -moveAmount : 0;
+
+    // New position calculations
+    const newX = stage.x() - moveX;
+    const newY = stage.y() - moveY;
+
+    // Use the `to` method to animate to the new position smoothly
+    stage.to({
+      x: newX,
+      y: newY,
+      duration: 0.1, // Duration in seconds, adjust for faster or slower animation
+    });
+
+    // Update the state or context with the new position, if necessary
+    // This is an asynchronous action since the movement is animated
+    setTimeout(() => {
+      setValue(STAGE_POSITION, { x: newX, y: newY });
+    }, 500); // Match the duration of the animation
+  }, []);
+
   const resetZoom = useCallback(() => {
     const stage = stageRef.current;
     if (!stage) {
@@ -273,18 +307,21 @@ const View: React.FC<ViewProps> = ({
       {({ store }) => (
         <Stage
           ref={stageRef}
-          width={window.innerWidth * 0.8}
-          height={window.innerHeight * 0.8}
+          width={window.innerWidth}
+          height={window.innerHeight}
           draggable={false}
-          onWheel={zoomOnWheel}
+          onWheel={moveOnWheel}
           onMouseDown={onMouseDownOnStage}
           onMouseMove={onMouseMoveOnStage}
           onMouseUp={onMouseUpOnStage}
-          className={[
-            positionStyles.absolute,
-            positionStyles.top0,
-            positionStyles.left0,
-          ].join(" ")}
+          className={
+            [
+              positionStyles.absolute,
+              positionStyles.top0,
+              positionStyles.left0,
+              positionStyles.height100,
+            ].join(" ") + " h-full"
+          }
         >
           <Provider store={store}>
             <Layer>
