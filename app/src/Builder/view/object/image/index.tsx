@@ -19,6 +19,7 @@ export type ImageItemKind = {
 export type ImageItemProps = OverrideItemProps<{
   data: StageData;
   e?: DragEvent;
+  setShowPopup: (val: boolean) => void;
 }>;
 
 export const filterMap: { [name: string]: Filter } = {
@@ -26,7 +27,12 @@ export const filterMap: { [name: string]: Filter } = {
   Grayscale: Konva.Filters.Grayscale,
 };
 
-const ImageItem: React.FC<ImageItemProps> = ({ data, e, onSelect }) => {
+const ImageItem: React.FC<ImageItemProps> = ({
+  data,
+  e,
+  onSelect,
+  setShowPopup,
+}) => {
   const { attrs } = data;
   const imageRef = useRef() as RefObject<Konva.Image>;
   const [imageSrc, setImageSrc] = useState<CanvasImageSource>(new Image());
@@ -114,6 +120,23 @@ const ImageItem: React.FC<ImageItemProps> = ({ data, e, onSelect }) => {
 
   useEffect(() => {
     imageRef.current!.cache();
+  }, []);
+
+  useEffect(() => {
+    const shapeNode = imageRef.current;
+    if (shapeNode) {
+      shapeNode.on("dragstart", (e) => {
+        setShowPopup(false);
+      });
+
+      shapeNode.on("dragend", (e) => {
+        setShowPopup(true);
+      });
+
+      return () => {
+        shapeNode.off("dragstart dragend");
+      };
+    }
   }, []);
 
   return (

@@ -6,6 +6,7 @@ import sizeStyles from "@/Builder/style/size.module.css";
 import Drag from "@/Builder/util/Drag";
 import TRIGGER from "@/Builder/config/trigger";
 import { ShapeItemKind } from "@/Builder/view/object/shape";
+import { motion } from "framer-motion";
 
 const ShapeWidget: React.FC = () => (
   <Row xs={2}>
@@ -46,9 +47,15 @@ const ShapeThumbnail: React.FC<{
         ...data,
       }}
     >
-      <i
-        className={[`bi-${data.icon}`].join(" ")}
-        style={{ fontSize: 20, width: 25 }}
+      <motion.i
+        initial={{ scale: 0 }}
+        animate={{ scale: 1, transition: { duration: 0.3, delay: 0.3 } }}
+        exit={{ scale: 0 }}
+        className={[`bi-${data.icon} p-3`].join(" bg-transparent")}
+        style={{
+          fontSize: 40,
+          color: "white",
+        }}
       />
     </Drag>
     {/* <Figure.Caption

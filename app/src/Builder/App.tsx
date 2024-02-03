@@ -34,6 +34,10 @@ import useWorkHistory from "./hook/useWorkHistory";
 import useI18n from "./hook/usei18n";
 import { initialStageDataList } from "../redux/initilaStageDataList";
 import Navigation from "./Navigation/Navigation";
+import Popup from "./Popup/Popup";
+import { useDispatch, useSelector } from "react-redux";
+import { popupAction } from "@/redux/popup";
+import { StoreState } from "@/redux/store";
 
 export type FileKind = {
   "file-id": string;
@@ -52,6 +56,7 @@ function App() {
     setPast,
     setFuture
   );
+  const [showPopup, setShowPopup] = useState(true);
   const transformer = useTransformer();
   const { selectedItems, onSelectItem, setSelectedItems, clearSelection } =
     useSelection(transformer);
@@ -81,10 +86,12 @@ function App() {
     const { id } = item.attrs;
     const target =
       item.attrs["data-item-type"] === "frame" ? item.getParent() : item;
+    console.log("stageData:", stageData);
     return {
       id: nanoid(),
       attrs: {
-        ...(stageData.find((_item) => _item.attrs.id === id)?.attrs ?? {}),
+        ...(stageData.find((_item) => (_item.attrs.id || _item.id) === id)
+          ?.attrs ?? {}),
       },
       className: target.getType(),
       children: [],
@@ -106,19 +113,19 @@ function App() {
     [tabList]
   );
 
-  const sortedStageData = useMemo(
-    () =>
-      stageData.sort((a, b) => {
-        if (a.attrs.zIndex === b.attrs.zIndex) {
-          if (a.attrs.zIndex < 0) {
-            return b.attrs.updatedAt - a.attrs.updatedAt;
-          }
-          return a.attrs.updatedAt - b.attrs.updatedAt;
+  const sortedStageData = useMemo(() => {
+    // Create a shallow copy of stageData before sorting
+    const dataCopy = [...stageData];
+    return dataCopy.sort((a, b) => {
+      if (a.attrs?.zIndex === b.attrs?.zIndex) {
+        if (a.attrs?.zIndex < 0) {
+          return b.attrs?.updatedAt - a.attrs?.updatedAt;
         }
-        return a.attrs.zIndex - b.attrs.zIndex;
-      }),
-    [stageData]
-  );
+        return a.attrs?.updatedAt - b.attrs?.updatedAt;
+      }
+      return a.attrs?.zIndex - b.attrs?.zIndex;
+    });
+  }, [stageData]);
 
   const header = (
     <Header>
@@ -193,6 +200,7 @@ function App() {
             key={`frame-${item.id}`}
             data={item as FrameProps["data"]}
             onSelect={onSelectItem}
+            setShowPopup={setShowPopup}
           />
         );
       case "image":
@@ -201,6 +209,7 @@ function App() {
             key={`image-${item.id}`}
             data={item as ImageItemProps["data"]}
             onSelect={onSelectItem}
+            setShowPopup={setShowPopup}
           />
         );
       case "text":
@@ -210,6 +219,7 @@ function App() {
             data={item as TextItemProps["data"]}
             transformer={transformer}
             onSelect={onSelectItem}
+            setShowPopup={setShowPopup}
           />
         );
       case "shape":
@@ -219,6 +229,7 @@ function App() {
             data={item as ShapeItemProps["data"]}
             transformer={transformer}
             onSelect={onSelectItem}
+            setShowPopup={setShowPopup}
           />
         );
       case "icon":
@@ -228,6 +239,7 @@ function App() {
             data={item as IconItemProps["data"]}
             transformer={transformer}
             onSelect={onSelectItem}
+            setShowPopup={setShowPopup}
           />
         );
       case "line":
@@ -237,6 +249,7 @@ function App() {
             data={item as LineItemProps["data"]}
             transformer={transformer}
             onSelect={onSelectItem}
+            setShowPopup={setShowPopup}
           />
         );
       default:
@@ -245,7 +258,7 @@ function App() {
   };
 
   useHotkeys(
-    "shift+up",
+    "ctrl+k",
     (e) => {
       e.preventDefault();
       layerUp(selectedItems);
@@ -255,7 +268,7 @@ function App() {
   );
 
   useHotkeys(
-    "shift+down",
+    "ctrl+m",
     (e) => {
       e.preventDefault();
       layerDown(selectedItems);
@@ -378,6 +391,32 @@ function App() {
     recordPast(stageData);
   }, [stageData]);
 
+  useEffect(() => {
+    const transformerNode = transformer.transformerRef.current;
+    if (transformerNode) {
+      transformerNode.on("transformstart", (e) => {
+        console.log("Resize or rotate start", e);
+        setShowPopup(false);
+      });
+
+      transformerNode.on("transformend", (e) => {
+        console.log("Resize or rotate end", e);
+        setShowPopup(true);
+      });
+
+      return () => {
+        // Clean up the event listener when the component unmounts or transformer changes
+        transformerNode.off("transformend");
+      };
+    }
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "ArrowUp" && event.shiftKey) {
+        console.log("Shift + ArrowUp simulated event detected.");
+        // Your logic here
+      }
+    });
+  }, []);
+
   return (
     <Layout header={header} navBar={navBar} settingBar={settingBar}>
       {hotkeyModal}
@@ -391,8 +430,16 @@ function App() {
           shouldOverdrawWholeArea
           boundBoxFunc={(_, newBox) => newBox}
           onTransformEnd={transformer.onTransformEnd}
+          borderStroke="#4d7ef7" // Customizing the border color
+          borderStrokeWidth={2}
+          anchorStroke="#dfdfdf"
+          anchorFill="white"
+          anchorSize={14}
+          anchorCornerRadius={15}
+          padding={5}
         />
       </View>
+      {showPopup && <Popup selectedItems={selectedItems} />}
     </Layout>
   );
 }

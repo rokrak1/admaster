@@ -14,6 +14,8 @@ import Drag from "@/Builder/util/Drag";
 import TRIGGER from "@/Builder/config/trigger";
 import useImageAsset from "@/Builder/hook/useImageAsset";
 import useI18n from "@/Builder/hook/usei18n";
+import { PlusCircleIcon } from "@heroicons/react/24/outline";
+import { motion } from "framer-motion";
 
 export const IMAGE_LIST_KEY = "importedImage";
 
@@ -62,27 +64,25 @@ const ImageWidget: React.FC = () => {
   };
 
   return (
-    <Col className={[sizeStyles["mx-h-30vh"]].join(" ")}>
-      <Row>
-        <h6>
+    <div className={"flex flex-col max-h-full overflow-hidden"}>
+      <motion.button
+        initial={{ scale: 0 }}
+        animate={{ scale: 1, transition: { duration: 0.2 } }}
+        exit={{ scale: 0, transition: { duration: 0.3 } }}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={uploadImage}
+        className={`duration-300 text-white self-center mb-3 flex bshadow px-5
+         items-center w-[200px] justify-center gap-x-2 p-2 w-max
+         rounded-lg bg-gradient-to-r from-zinc-700 from-0% to-neutral-600 to-100%
+         `}
+      >
+        <span className="font-semibold">
           {getTranslation("widget", "image", "name")}
-          <Button
-            className={[
-              colorStyles.transparentDarkColorTheme,
-              borderStyles.none,
-              displayStyles["inline-block"],
-              sizeStyles.width25,
-              spaceStyles.p0,
-              spaceStyles.ml1rem,
-              alignStyles["text-left"],
-            ].join(" ")}
-            onClick={uploadImage}
-          >
-            <i className="bi-plus" />
-          </Button>
-        </h6>
-      </Row>
-      <Row xs={2}>
+        </span>
+        <PlusCircleIcon className="w-7" />
+      </motion.button>
+      <div className="grid grid-cols-2 gap-4 overflow-scroll pretty-scrollbar">
         {imageAssetList.map((_data) => (
           <ImageThumbnail
             key={`image-thumbnail-${_data.id}`}
@@ -95,8 +95,8 @@ const ImageWidget: React.FC = () => {
             maxPx={80}
           />
         ))}
-      </Row>
-    </Col>
+      </div>
+    </div>
   );
 };
 
@@ -123,24 +123,34 @@ const ImageThumbnail: React.FC<{
           varId: id,
         }}
       >
-        <Figure.Image
+        <motion.img
+          initial={{ scale: 0 }}
+          animate={{ scale: 1, transition: { duration: 0.3, delay: 0.2 } }}
+          exit={{ scale: 0, transition: { duration: 0.3 } }}
           alt={data.name}
           src={
             data.src.startsWith("data:")
               ? data.src
               : `/assets/image/${data.src}`
           }
+          className="p-1"
         />
       </Drag>
-      <Figure.Caption
-        className={[
-          fontStyles.font075em,
-          sizeStyles.width100,
-          "text-center",
-        ].join(" ")}
+      <motion.span
+        initial={{ scale: 0 }}
+        animate={{ scale: 1, transition: { duration: 0.3, delay: 0.2 } }}
+        exit={{ scale: 0, transition: { duration: 0.3 } }}
       >
-        {data.name}
-      </Figure.Caption>
+        <Figure.Caption
+          className={[
+            fontStyles.font075em,
+            sizeStyles.width100,
+            "text-center",
+          ].join(" ")}
+        >
+          {data.name}
+        </Figure.Caption>
+      </motion.span>
     </Figure>
   );
 };

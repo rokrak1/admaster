@@ -25,8 +25,49 @@ body,
 #root {
   height: 100%;
   overflow: hidden;
+
 }
 
 .bshadow {
   box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px 0px;
+}
+
+.form-control:focus {
+  box-shadow: none !important;
+}
+
+::-webkit-scrollbar-track {
+  background: #37393b;
+}
+
+/* Styles the scrollbar thumb (the draggable part) */
+::-webkit-scrollbar-thumb {
+  background: #5e5e5e;
+}
+
+/* Styles the scrollbar thumb on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #5e5e5e;
+}
+
+/* Sets the scrollbar width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+.range-slider__tooltip__label{
+  display:none !important;
+}
+.custom-range::-webkit-slider-thumb {
+  background: gray;
+}
+
+.custom-range::-moz-range-thumb {
+  background: gray;
+}
+
+.custom-range::-ms-thumb {
+  background: gray;
+}
+.range-slider__wrap{
+  display:flex !important;
 }

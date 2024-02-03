@@ -22,6 +22,7 @@ export type ShapeItemProps = OverrideItemProps<{
   data: StageData;
   transformer: ReturnType<typeof useTransformer>;
   e?: DragEvent;
+  setShowPopup: (val: boolean) => void;
 }>;
 
 const ShapeItem: React.FC<ShapeItemProps> = ({
@@ -29,6 +30,7 @@ const ShapeItem: React.FC<ShapeItemProps> = ({
   e,
   transformer,
   onSelect,
+  setShowPopup,
 }) => {
   const { attrs } = data;
 
@@ -45,6 +47,23 @@ const ShapeItem: React.FC<ShapeItemProps> = ({
       checkIsInFrame(shapeRef.current);
     }
   }, [data]);
+
+  useEffect(() => {
+    const shapeNode = shapeRef.current;
+    if (shapeNode) {
+      shapeNode.on("dragstart", (e) => {
+        setShowPopup(false);
+      });
+
+      shapeNode.on("dragend", (e) => {
+        setShowPopup(true);
+      });
+
+      return () => {
+        shapeNode.off("dragstart dragend");
+      };
+    }
+  }, []);
 
   if (attrs.sides === 4) {
     return (

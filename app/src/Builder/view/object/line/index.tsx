@@ -2,7 +2,7 @@ import { Context } from "konva/lib/Context";
 import { Group as GroupType } from "konva/lib/Group";
 import { KonvaEventObject } from "konva/lib/Node";
 import { Shape as ShapeType, ShapeConfig } from "konva/lib/Shape";
-import React, { RefObject, useCallback, useRef } from "react";
+import React, { RefObject, useCallback, useEffect, useRef } from "react";
 import { Group, Shape } from "react-konva";
 import useItem, { OverrideItemProps } from "@/Builder/hook/useItem";
 import useTransformer from "@/Builder/hook/useTransformer";
@@ -22,6 +22,7 @@ export type LineItemProps = OverrideItemProps<{
   data: StageData;
   transformer: ReturnType<typeof useTransformer>;
   e?: DragEvent;
+  setShowPopup: (val: boolean) => void;
 }>;
 
 const LineItem: React.FC<LineItemProps> = ({
@@ -29,6 +30,7 @@ const LineItem: React.FC<LineItemProps> = ({
   e,
   transformer,
   onSelect,
+  setShowPopup,
 }) => {
   const {
     attrs: { updatedAt, zIndex, points, ...attrs },
@@ -72,6 +74,23 @@ const LineItem: React.FC<LineItemProps> = ({
     },
     [data]
   );
+
+  useEffect(() => {
+    const shapeNode = lineRef.current;
+    if (shapeNode) {
+      shapeNode.on("dragstart", (e) => {
+        setShowPopup(false);
+      });
+
+      shapeNode.on("dragend", (e) => {
+        setShowPopup(true);
+      });
+
+      return () => {
+        shapeNode.off("dragstart dragend");
+      };
+    }
+  }, []);
 
   return (
     <Group>

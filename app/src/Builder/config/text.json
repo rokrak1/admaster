@@ -6,7 +6,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "serif",
-    "text": "%VAR_TITLE%"
+    "text": "Seize the day with kindness."
   },
   {
     "type": "text",
@@ -15,7 +15,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'Fira Mono', monospace",
-    "text": "hello world!"
+    "text": "Embrace the unknown."
   },
   {
     "type": "text",
@@ -24,7 +24,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'Hurricane', cursive",
-    "text": "hello world!"
+    "text": "Craft your dreams."
   },
   {
     "type": "text",
@@ -33,7 +33,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'League Gothic', sans-serif",
-    "text": "hello world!"
+    "text": "Venture beyond."
   },
   {
     "type": "text",
@@ -42,7 +42,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'Roboto Slab', serif",
-    "text": "hello world!"
+    "text": "Inspire innovation."
   },
   {
     "type": "text",
@@ -51,7 +51,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'Nanum Gothic', sans-serif",
-    "text": "안녕하세요"
+    "text": "Dream big. Work hard."
   },
   {
     "type": "text",
@@ -60,7 +60,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'Do Hyeon', sans-serif",
-    "text": "안녕하세요"
+    "text": "Stay positive and happy."
   },
   {
     "type": "text",
@@ -69,7 +69,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'Gamja Flower', cursive",
-    "text": "안녕하세요"
+    "text": "Be the change you wish to see."
   },
   {
     "type": "text",
@@ -78,7 +78,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'Jua', sans-serif",
-    "text": "안녕하세요"
+    "text": "Keep pushing forward."
   },
   {
     "type": "text",
@@ -87,7 +87,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'Noto Sans KR', sans-serif",
-    "text": "안녕하세요"
+    "text": "Embrace the journey."
   },
   {
     "type": "text",
@@ -96,7 +96,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'Noto Serif KR', serif",
-    "text": "안녕하세요"
+    "text": "Live, laugh, love."
   },
   {
     "type": "text",
@@ -105,7 +105,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'Ma Shan Zheng', cursive",
-    "text": "你是我的朋友"
+    "text": "Explore, dream, discover."
   },
   {
     "type": "text",
@@ -114,7 +114,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'Noto Serif SC', serif",
-    "text": "你是我的朋友"
+    "text": "Never stop learning."
   },
   {
     "type": "text",
@@ -123,7 +123,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'ZCOOL KuaiLe', cursive",
-    "text": "你是我的朋友"
+    "text": "Create your own sunshine."
   },
   {
     "type": "text",
@@ -132,7 +132,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'M PLUS 1', sans-serif",
-    "text": "今日は気持ちいい"
+    "text": "Happiness is a journey."
   },
   {
     "type": "text",
@@ -141,7 +141,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'Noto Sans JP', sans-serif",
-    "text": "今日は気持ちいい"
+    "text": "Believe in yourself."
   },
   {
     "type": "text",
@@ -150,7 +150,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'Noto Serif JP', serif",
-    "text": "今日は気持ちいい"
+    "text": "Chase your dreams."
   },
   {
     "type": "text",
@@ -159,7 +159,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'Rampart One', cursive",
-    "text": "今日は気持ちいい"
+    "text": "Every moment matters."
   },
   {
     "type": "text",
@@ -168,7 +168,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'Yuji Hentaigana Akebono', cursive",
-    "text": "今日は気持ちいい"
+    "text": "Find joy in the ordinary."
   },
   {
     "type": "text",
@@ -177,7 +177,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'Zen Kurenaido', sans-serif",
-    "text": "今日は気持ちいい"
+    "text": "Gratitude changes everything."
   },
   {
     "type": "text",
@@ -186,7 +186,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'Anton', sans-serif",
-    "text": "bầu trời màu xanh"
+    "text": "Focus on the good."
   },
   {
     "type": "text",
@@ -195,7 +195,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'Dancing Script', cursive",
-    "text": "bầu trời màu xanh"
+    "text": "Spread love everywhere you go."
   },
   {
     "type": "text",
@@ -204,7 +204,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'Inconsolata', monospace",
-    "text": "bầu trời màu xanh"
+    "text": "Be brave, be kind."
   },
   {
     "type": "text",
@@ -213,7 +213,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'Open Sans', sans-serif",
-    "text": "bầu trời màu xanh"
+    "text": "A smile is a universal welcome."
   },
   {
     "type": "text",
@@ -222,7 +222,7 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'Playfair Display', serif",
-    "text": "bầu trời màu xanh"
+    "text": "Make today amazing."
   },
   {
     "type": "text",
@@ -231,6 +231,6 @@
     "height": 35,
     "fontSize": 30,
     "fontFamily": "'Roboto Mono', monospace",
-    "text": "bầu trời màu xanh"
+    "text": "Every day is a new beginning."
   }
 ]

@@ -24,7 +24,13 @@ type AlignWidgetProps = {
 };
 
 const AlignWidget: React.FC<AlignWidgetProps> = ({ data }) => (
-  <Col>
+  <div
+    className="absolute bottom-12 bshadow p-2 bg-white rounded-lg"
+    style={{
+      width: 190,
+      left: -90,
+    }}
+  >
     <Row>
       {alignList.map((_data) => (
         <AlignThumbnail
@@ -38,7 +44,7 @@ const AlignWidget: React.FC<AlignWidgetProps> = ({ data }) => (
         />
       ))}
     </Row>
-  </Col>
+  </div>
 );
 
 export default AlignWidget;

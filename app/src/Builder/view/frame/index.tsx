@@ -20,9 +20,10 @@ export type FrameKind = {
 export type FrameProps = OverrideItemProps<{
   data: StageData;
   e?: DragEvent;
+  setShowPopup: (val: boolean) => void;
 }>;
 
-const Frame: React.FC<FrameProps> = ({ data, e, onSelect }) => {
+const Frame: React.FC<FrameProps> = ({ data, e, onSelect, setShowPopup }) => {
   const { id: stageId, attrs } = data;
   const { updateItem } = useItem();
   const stage = useStage();
@@ -98,6 +99,23 @@ const Frame: React.FC<FrameProps> = ({ data, e, onSelect }) => {
       frameRef.current.cache();
     }
   }, [data]);
+
+  useEffect(() => {
+    const shapeNode = frameRef.current;
+    if (shapeNode) {
+      shapeNode.on("dragstart", (e) => {
+        setShowPopup(false);
+      });
+
+      shapeNode.on("dragend", (e) => {
+        setShowPopup(true);
+      });
+
+      return () => {
+        shapeNode.off("dragstart dragend");
+      };
+    }
+  }, []);
 
   return (
     <Group name="label-group" onClick={onSelect} clipFunc={clipFunc}>

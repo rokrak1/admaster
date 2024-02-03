@@ -1,6 +1,6 @@
 import Konva from "konva";
 import { KonvaEventObject } from "konva/lib/Node";
-import React, { RefObject, useCallback, useRef } from "react";
+import React, { RefObject, useCallback, useEffect, useRef } from "react";
 import { Text as KonvaText } from "react-konva";
 import useItem, { OverrideItemProps } from "@/Builder/hook/useItem";
 import useTransformer from "@/Builder/hook/useTransformer";
@@ -21,6 +21,7 @@ export type TextItemProps = OverrideItemProps<{
   data: StageData;
   transformer: ReturnType<typeof useTransformer>;
   e?: DragEvent;
+  setShowPopup: (val: boolean) => void;
 }>;
 
 const TextItem: React.FC<TextItemProps> = ({
@@ -28,6 +29,7 @@ const TextItem: React.FC<TextItemProps> = ({
   e,
   transformer,
   onSelect,
+  setShowPopup,
 }) => {
   const { attrs } = data;
 
@@ -248,6 +250,23 @@ const TextItem: React.FC<TextItemProps> = ({
     }
     onEditStart();
   };
+
+  useEffect(() => {
+    const shapeNode = textRef.current;
+    if (shapeNode) {
+      shapeNode.on("dragstart", (e) => {
+        setShowPopup(false);
+      });
+
+      shapeNode.on("dragend", (e) => {
+        setShowPopup(true);
+      });
+
+      return () => {
+        shapeNode.off("dragstart dragend");
+      };
+    }
+  }, []);
 
   return (
     <KonvaText

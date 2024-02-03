@@ -21,9 +21,15 @@ export type IconItemKind = {
 export type IconItemProps = OverrideItemProps<{
   data: StageData;
   e?: DragEvent;
+  setShowPopup: (val: boolean) => void;
 }>;
 
-const IconItem: React.FC<IconItemProps> = ({ data, e, onSelect }) => {
+const IconItem: React.FC<IconItemProps> = ({
+  data,
+  e,
+  onSelect,
+  setShowPopup,
+}) => {
   const { attrs } = data;
   const imageRef = useRef() as RefObject<Konva.Image>;
   const [imageSrc, setImageSrc] = useState<CanvasImageSource>(new Image());
@@ -52,6 +58,23 @@ const IconItem: React.FC<IconItemProps> = ({ data, e, onSelect }) => {
         setImageSrc(image.image()!);
       }
     );
+  }, []);
+
+  useEffect(() => {
+    const shapeNode = imageRef.current;
+    if (shapeNode) {
+      shapeNode.on("dragstart", (e) => {
+        setShowPopup(false);
+      });
+
+      shapeNode.on("dragend", (e) => {
+        setShowPopup(true);
+      });
+
+      return () => {
+        shapeNode.off("dragstart dragend");
+      };
+    }
   }, []);
 
   return (

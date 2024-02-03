@@ -1,7 +1,7 @@
 {
   "image": {
     "id": "image",
-    "name": "Image"
+    "name": "Upload Image"
   },
   "colorPalette": {
     "id": "colorPalette",
@@ -277,7 +277,7 @@
     "name": "Icon",
     "search": {
       "title": "Search Icon",
-      "placeholder": "Enter keyword",
+      "placeholder": "Search icons",
       "desc": "Type a keyword to find icon"
     }
   },

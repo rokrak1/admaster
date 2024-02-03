@@ -6,6 +6,7 @@ import alignStyles from "@/Builder/style/align.module.css";
 import sizeStyles from "@/Builder/style/size.module.css";
 import Drag from "@/Builder/util/Drag";
 import TRIGGER from "@/Builder/config/trigger";
+import { motion } from "framer-motion";
 
 const TextWidget: React.FC = () => (
   <Row xs={2} className={[sizeStyles["mx-h-30vh"]].join(" ")}>
@@ -36,7 +37,9 @@ const TextThumbnail: React.FC<{ maxPx: number; data: TextItemKind }> = ({
 }) => (
   <Figure
     as={Col}
-    className={[alignStyles.absoluteCenter, alignStyles.wrapTrue].join(" ")}
+    className={
+      [alignStyles.absoluteCenter, alignStyles.wrapTrue].join(" ") + " my-2"
+    }
   >
     <Drag
       dragType="copyMove"
@@ -45,16 +48,20 @@ const TextThumbnail: React.FC<{ maxPx: number; data: TextItemKind }> = ({
         ...data,
       }}
     >
-      <h6
+      <motion.h6
+        initial={{ scale: 0 }}
+        animate={{ scale: 1, transition: { duration: 0.3, delay: 0.3 } }}
+        exit={{ scale: 0 }}
         style={{
           width: "100%",
           fontFamily: data.fontFamily,
           fontSize: data.fontSize - 10,
           textAlign: "center",
         }}
+        className="text-white"
       >
         {data.text}
-      </h6>
+      </motion.h6>
     </Drag>
     {/* <Figure.Caption
         className={[fontStyles.fontHalf1em, "text-center"].join(" ")}

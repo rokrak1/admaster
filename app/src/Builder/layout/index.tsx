@@ -25,39 +25,16 @@ const Layout: React.FC<LayoutProps> = ({
 }) => (
   <Container
     fluid
-    className={[sizeStyles.height100, overflowStyles.hide].join(" ") + " p-0"}
+    className={
+      [sizeStyles.height100, overflowStyles.hide].join(" relative") + " p-0"
+    }
   >
     {navBar}
-    <Row
-      xs={12}
-      className={[
-        sizeStyles.height100,
-        positionStyles.relative,
-        positionStyles.zIndex1,
-      ].join(" ")}
-    >
-      <Col
-        xs={2}
-        className={[
-          colorStyles.darkTheme,
-          sizeStyles.height100,
-          positionStyles.relative,
-          positionStyles.zIndex1,
-        ].join(" ")}
-      >
-        {settingBar}
-      </Col>
-      <Col
-        className={[
-          sizeStyles.height100,
-          positionStyles.relative,
-          colorStyles.greyTheme,
-          positionStyles.zIndex1,
-        ].join(" ")}
-      >
-        {children}
-      </Col>
-    </Row>
+    <div className="flex w-full h-full">
+      <div className="flex-shrink-0">{settingBar}</div>
+      <div className="flex-grow h-[calc(100%-60px)] relative">{children}</div>
+    </div>
+
     {/*     <Row
       xs={12}
       className={[

@@ -27,6 +27,7 @@ import { SettingBarProps } from "..";
 import useItem from "@/Builder/hook/useItem";
 import useLocalStorage from "@/Builder/hook/useLocalStorage";
 import useI18n from "@/Builder/hook/usei18n";
+import { OpacityIcon } from "@/common/icons";
 
 export type ColorPaletteKind = {
   "data-item-type": string;
@@ -54,11 +55,16 @@ const ColorPaletteWidget: React.FC<ColorPaletteWidgetProps> = ({ data }) => {
     return [...colorPaletteList];
   });
 
-  const changeNewColor = (color: ColorResult) => {
+  const changeNewColor = (
+    color: ColorResult,
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    e.stopPropagation();
     setNewColor(color.hex);
   };
 
   const toggleColorPicker = (e?: React.MouseEvent<HTMLElement>) => {
+    e?.stopPropagation();
     if (showColorPicker) {
       addColor();
     }
@@ -81,6 +87,7 @@ const ColorPaletteWidget: React.FC<ColorPaletteWidgetProps> = ({ data }) => {
   };
 
   const onClearColorClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
     if (!data.selectedItems[0]) {
       return;
     }
@@ -95,99 +102,110 @@ const ColorPaletteWidget: React.FC<ColorPaletteWidgetProps> = ({ data }) => {
     );
   };
   return (
-    <Col>
-      <h6>
-        {getTranslation("widget", "colorPalette", "name")}
-        <OverlayTrigger
-          placement="bottom"
-          overlay={
-            <Tooltip id="tooltip-clear-color">
-              {getTranslation("widget", "colorPalette", "addColor", "name")}
-            </Tooltip>
-          }
-        >
-          <Button
-            className={[
-              colorStyles.transparentDarkColorTheme,
-              borderStyles.none,
-              displayStyles["inline-block"],
-              sizeStyles.width10,
-              spaceStyles.p0,
-              spaceStyles.ml1rem,
-              alignStyles["text-left"],
-            ].join(" ")}
-            onClick={toggleColorPicker}
+    <div
+      className="absolute bottom-12 p-2 bg-white rounded-lg bshadow"
+      style={{
+        width: 200,
+        left: -100,
+      }}
+    >
+      <Col>
+        <h6>
+          {getTranslation("widget", "colorPalette", "name")}
+          <OverlayTrigger
+            placement="bottom"
+            overlay={
+              <Tooltip id="tooltip-clear-color">
+                {getTranslation("widget", "colorPalette", "addColor", "name")}
+              </Tooltip>
+            }
           >
-            <i className="bi-plus" />
-          </Button>
-        </OverlayTrigger>
-        <OverlayTrigger
-          placement="bottom"
-          overlay={
-            <Tooltip id="tooltip-clear-color">
-              {getTranslation("widget", "colorPalette", "clearColor", "name")}
-            </Tooltip>
-          }
-        >
-          <Button
-            className={[
-              colorStyles.transparentDarkColorTheme,
-              borderStyles.none,
-              displayStyles["inline-block"],
-              sizeStyles.width10,
-              spaceStyles.p0,
-              spaceStyles.ml1rem,
-              alignStyles["text-left"],
-            ].join(" ")}
-            onClick={onClearColorClick}
+            <Button
+              className={[
+                colorStyles.transparentDarkColorTheme,
+                borderStyles.none,
+                displayStyles["inline-block"],
+                sizeStyles.width10,
+                spaceStyles.p0,
+                spaceStyles.ml1rem,
+                alignStyles["text-left"],
+              ].join(" ")}
+              onClick={toggleColorPicker}
+            >
+              <i className="bi-plus text-black" />
+            </Button>
+          </OverlayTrigger>
+          <OverlayTrigger
+            placement="bottom"
+            overlay={
+              <Tooltip id="tooltip-clear-color">
+                {getTranslation("widget", "colorPalette", "clearColor", "name")}
+              </Tooltip>
+            }
           >
-            <i className="bi-x-circle" />
-          </Button>
-        </OverlayTrigger>
-      </h6>
-      {showColorPicker && (
-        <SketchPicker
-          color={newColor}
-          onChange={changeNewColor}
-          className={[
-            positionStyles.absolute,
-            positionStyles.left0,
-            positionStyles.zIndex3,
-          ].join(" ")}
+            <Button
+              className={[
+                colorStyles.transparentDarkColorTheme,
+                borderStyles.none,
+                displayStyles["inline-block"],
+                sizeStyles.width10,
+                spaceStyles.p0,
+                spaceStyles.ml1rem,
+                alignStyles["text-left"],
+              ].join(" ")}
+              onClick={onClearColorClick}
+            >
+              <i className="bi-x-circle" />
+            </Button>
+          </OverlayTrigger>
+        </h6>
+        {showColorPicker && (
+          <SketchPicker
+            color={newColor}
+            onChange={changeNewColor}
+            onChangeComplete={(_, e) => e.stopPropagation()}
+            className={[
+              positionStyles.absolute,
+              positionStyles.left0,
+              positionStyles.zIndex3,
+            ].join(" ")}
+          />
+        )}
+        <Row xs={4}>
+          {colorList.map((_data) => (
+            <ColorPaletteThumbnail
+              key={`colorPalette-thumbnail-${_data.id}`}
+              data={{
+                id: _data.id,
+                "data-item-type": "color",
+                colorCode: _data.colorCode,
+                selectedItems: data.selectedItems,
+              }}
+            />
+          ))}
+        </Row>
+        <ColorPaletteOpacitySlider
+          data={{
+            "data-item-type": "opacity",
+            selectedItems: data.selectedItems,
+          }}
         />
-      )}
-      <Row xs={4}>
-        {colorList.map((_data) => (
-          <ColorPaletteThumbnail
-            key={`colorPalette-thumbnail-${_data.id}`}
+        {/*     <ColorPaletteBrightnessSlider
+          data={{
+            "data-item-type": "brightness",
+            selectedItems: data.selectedItems,
+          }}
+        /> */}
+        {data?.itemType === "image" && (
+          <ColorPaletteGrayScaleToggle
             data={{
-              id: _data.id,
-              "data-item-type": "color",
-              colorCode: _data.colorCode,
+              "data-item-type": "grayScale",
               selectedItems: data.selectedItems,
             }}
           />
-        ))}
-      </Row>
-      <ColorPaletteOpacitySlider
-        data={{
-          "data-item-type": "opacity",
-          selectedItems: data.selectedItems,
-        }}
-      />
-      <ColorPaletteBrightnessSlider
-        data={{
-          "data-item-type": "brightness",
-          selectedItems: data.selectedItems,
-        }}
-      />
-      <ColorPaletteGrayScaleToggle
-        data={{
-          "data-item-type": "grayScale",
-          selectedItems: data.selectedItems,
-        }}
-      />
-    </Col>
+        )}
+      </Col>
+    </div>
   );
 };
 
@@ -265,14 +283,18 @@ const ColorPaletteOpacitySlider: React.FC<{
   };
 
   return (
-    <Col>
-      <h6>{getTranslation("widget", "colorPalette", "opacity", "name")}</h6>
-      <RangeSlider
-        tooltipLabel={(value) => `${value}%`}
-        value={opacity}
-        onChange={onChangeOpacity}
-      />
-    </Col>
+    <div className="flex items-center mt-3">
+      <span className="mr-3">
+        <OpacityIcon color={"#999"} size={26} />
+      </span>
+      <span className="max-w-[60px]">
+        <RangeSlider
+          className="custom-range"
+          value={opacity}
+          onChange={onChangeOpacity}
+        />
+      </span>
+    </div>
   );
 };
 

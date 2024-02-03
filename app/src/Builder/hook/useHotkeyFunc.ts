@@ -73,9 +73,10 @@ const useHotkeyFunc = () => {
     selectedItems: Node<NodeConfig>[],
     createStageDataObject: (item: Node<NodeConfig>) => StageData
   ) => {
+    console.log("selitems: ", selectedItems);
     selectedItems
       .map((item) => createStageDataObject(item))
-      .sort((a, b) => {
+      /* .sort((a, b) => {
         if (a.attrs.zIndex === b.attrs.zIndex) {
           if (a.attrs.zIndex < 0) {
             return b.attrs.updatedAt - a.attrs.updatedAt;
@@ -83,7 +84,7 @@ const useHotkeyFunc = () => {
           return a.attrs.updatedAt - b.attrs.updatedAt;
         }
         return a.attrs.zIndex - b.attrs.zIndex;
-      })
+      }) */
       .forEach((item) => {
         createItem({
           ...item,
