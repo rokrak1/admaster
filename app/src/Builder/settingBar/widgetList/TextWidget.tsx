@@ -7,27 +7,47 @@ import sizeStyles from "@/Builder/style/size.module.css";
 import Drag from "@/Builder/util/Drag";
 import TRIGGER from "@/Builder/config/trigger";
 import { motion } from "framer-motion";
+import { useSelector } from "react-redux";
+import { StoreState } from "@/redux/store";
 
-const TextWidget: React.FC = () => (
-  <Row xs={2} className={[sizeStyles["mx-h-30vh"]].join(" ")}>
-    {textList.map(({ type, id, width, height, fontSize, fontFamily, text }) => (
-      <TextThumbnail
-        key={`text-thumbnail-${id}`}
-        data={{
-          id,
-          name: text,
-          width,
-          height,
-          fontSize,
-          fontFamily,
-          text,
-          "data-item-type": type,
-        }}
-        maxPx={80}
-      />
-    ))}
-  </Row>
-);
+const TextWidget: React.FC<{ varsOnly?: boolean }> = ({ varsOnly }) => {
+  const dataFeedVariables = useSelector(
+    (state: StoreState) => state.dataFeed.dataFeedVariables
+  );
+  console.log(textList);
+  const textListFiltered = !varsOnly
+    ? textList
+    : dataFeedVariables.map((v) => {
+        let textx = { ...textList[0] };
+        textx.text = `%VAR_${v}%`;
+        return textx;
+      });
+
+  console.log("textListFiltered", textListFiltered);
+  return (
+    <Row xs={2} className={[sizeStyles["mx-h-30vh"]].join(" ")}>
+      {textListFiltered.length &&
+        textListFiltered.map(
+          ({ type, id, width, height, fontSize, fontFamily, text }) => (
+            <TextThumbnail
+              key={`text-thumbnail-${id}`}
+              data={{
+                id,
+                name: text,
+                width,
+                height,
+                fontSize,
+                fontFamily,
+                text,
+                "data-item-type": type,
+              }}
+              maxPx={80}
+            />
+          )
+        )}
+    </Row>
+  );
+};
 
 export default TextWidget;
 
@@ -60,7 +80,9 @@ const TextThumbnail: React.FC<{ maxPx: number; data: TextItemKind }> = ({
         }}
         className="text-white"
       >
-        {data.text}
+        {data.text.includes("%VAR_")
+          ? data.text.split("%VAR_")[1].split("%")[0]
+          : data.text}
       </motion.h6>
     </Drag>
     {/* <Figure.Caption

@@ -14,12 +14,10 @@ const AppWrapper = () => {
     StoreState,
     DataFeed
   >((state) => state.dataFeed);
-  console.log("DF:", dataFeed);
 
   const parseCSV = (csv: File) => {
     Papa.parse(csv, {
       complete: (result) => {
-        console.log("Parsed: ", result);
         dispatch(dataFeedAction.parseCSV(result));
       },
       header: true,
@@ -54,7 +52,6 @@ const AppWrapper = () => {
     event.target.value = "";
   };
 
-  console.log("dataFeedTemplatePreviewImages:", dataFeedTemplatePreviewImages);
   return (
     <div className="w-full h-full bg-[#EDF2F7]">
       {/*  <input type="file" accept=".csv" onChange={onFileChange} />

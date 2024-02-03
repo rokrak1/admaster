@@ -9,6 +9,7 @@ import {
   LayerUp,
 } from "@/common/icons";
 import { useState } from "react";
+import { popupTransformers, standardTransformers } from "./basicTransformers";
 
 interface PopupProps {
   selectedItems: Node<NodeConfig>[];
@@ -45,74 +46,11 @@ const Popup: React.FC<PopupProps> = ({ selectedItems }) => {
   const selectedItem = selectedItems[0];
   const { x, y, width, height } = selectedItem.getClientRect();
 
-  const popupX = x + width / 2 - 120;
-  const popupY = y - 70;
+  const popupX = x + width / 2 - 90;
+  const popupY = y - 80;
 
   const itemType = selectedItem.attrs["data-item-type"];
   const availablePopupTypes = ["shape", "text", "image", "icon"];
-  console.log(itemType);
-
-  const standardIcons = [
-    {
-      id: "delete",
-      name: "Delete",
-      icon: DeleteIcon,
-      onClick: () => {
-        const backspaceEvent = new KeyboardEvent("keydown", {
-          key: "Backspace",
-          code: "Backspace",
-          keyCode: 8, // Deprecated, but included for compatibility
-          bubbles: true, // Make sure the event bubbles for visibility
-        });
-        document.dispatchEvent(backspaceEvent);
-      },
-    },
-    {
-      id: "duplicate",
-      name: "Duplicate",
-      icon: DuplicateIcon,
-      onClick: () => {
-        const dDownEvent = new KeyboardEvent("keydown", {
-          key: "d",
-          keyCode: 68,
-          which: 68,
-          ctrlKey: true,
-          bubbles: true,
-        });
-        document.dispatchEvent(dDownEvent);
-      },
-    },
-    {
-      id: "layer-up",
-      name: "Layer Up",
-      icon: LayerUp,
-      onClick: () => {
-        const dDownEvent = new KeyboardEvent("keydown", {
-          key: "k",
-          keyCode: 75,
-          which: 75,
-          ctrlKey: true,
-          bubbles: true,
-        });
-        document.dispatchEvent(dDownEvent);
-      },
-    },
-    {
-      id: "layer-down",
-      name: "Layer Down",
-      icon: LayerDown,
-      onClick: () => {
-        const dDownEvent = new KeyboardEvent("keydown", {
-          key: "m",
-          keyCode: 77,
-          which: 77,
-          ctrlKey: true,
-          bubbles: true,
-        });
-        document.dispatchEvent(dDownEvent);
-      },
-    },
-  ];
 
   return (
     <div
@@ -126,7 +64,7 @@ const Popup: React.FC<PopupProps> = ({ selectedItems }) => {
       className="bg-white border-gray-100 bshadow border rounded-lg"
     >
       <div className="flex gap-x-0 justify-center p-0.5">
-        {standardIcons.map((icon) => (
+        {popupTransformers.map((icon) => (
           <div
             key={icon.id}
             onClick={icon.onClick}
@@ -155,7 +93,6 @@ const PopupComponentRenderer: React.FC<{
   itemType: string;
 }> = ({ icon, selectedItems, itemType }) => {
   const [isOpened, setIsOpened] = useState<WidgetsEnum | null>(null);
-
   const { id, name } = icon;
   return (
     <div

@@ -31,10 +31,8 @@ const useTool = (
       selectedItems.length === 1 &&
       selectedItems[0].attrs["data-item-type"] === "image"
     ) {
-      console.log("in");
       const originalImage = new Image();
       originalImage.onload = () => {
-        console.log("load");
         originalImage.width = attrs.width;
         originalImage.height = attrs.height;
         autoRemoveBackground(originalImage).then((base64: string) => {
@@ -51,7 +49,6 @@ const useTool = (
   };
 
   const getClickCallback = (id: string) => () => {
-    console.log(id);
     switch (id) {
       case "select-all":
         return hotkeyFunc.selectAll(stage, onSelectItem);

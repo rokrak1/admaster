@@ -23,6 +23,7 @@ import {
   VariableIcon,
 } from "@/common/icons";
 import { AnimatePresence, motion } from "framer-motion";
+import VariablesWidget from "./widgetList/VariablesWidget";
 
 export type SettingBarProps = {
   selectedItems: Node<NodeConfig>[];
@@ -32,6 +33,7 @@ export type SettingBarProps = {
 };
 
 export enum WidgetsEnum {
+  variables = "variables",
   colorPalette = "colorPalette",
   align = "align",
   image = "image",
@@ -50,6 +52,7 @@ type IWidgets = {
 };
 
 export const Widgets: IWidgets = {
+  variables: (data: WidgetKind & SettingBarProps) => <VariablesWidget />,
   colorPalette: (data: WidgetKind & SettingBarProps) => (
     <ColorPaletteWidget data={data} />
   ),
@@ -70,11 +73,11 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  /*   {
+  {
     id: "variables",
     name: "Variables",
     Icon: VariableIcon,
-  }, */
+  },
   {
     id: WidgetsEnum.image,
     name: "Image",

@@ -105,11 +105,12 @@ const ColorPaletteWidget: React.FC<ColorPaletteWidgetProps> = ({ data }) => {
     <div
       className="absolute bottom-12 p-2 bg-white rounded-lg bshadow"
       style={{
-        width: 200,
+        width: 300,
         left: -100,
       }}
+      onClick={(e) => e.stopPropagation()}
     >
-      <Col>
+      <div className="flex-col">
         <h6>
           {getTranslation("widget", "colorPalette", "name")}
           <OverlayTrigger
@@ -155,7 +156,7 @@ const ColorPaletteWidget: React.FC<ColorPaletteWidgetProps> = ({ data }) => {
               ].join(" ")}
               onClick={onClearColorClick}
             >
-              <i className="bi-x-circle" />
+              <i className="bi-x-circle text-black" />
             </Button>
           </OverlayTrigger>
         </h6>
@@ -163,7 +164,7 @@ const ColorPaletteWidget: React.FC<ColorPaletteWidgetProps> = ({ data }) => {
           <SketchPicker
             color={newColor}
             onChange={changeNewColor}
-            onChangeComplete={(_, e) => e.stopPropagation()}
+            onChangeComplete={changeNewColor}
             className={[
               positionStyles.absolute,
               positionStyles.left0,
@@ -171,7 +172,7 @@ const ColorPaletteWidget: React.FC<ColorPaletteWidgetProps> = ({ data }) => {
             ].join(" ")}
           />
         )}
-        <Row xs={4}>
+        <div className="grid grid-cols-6 gap-2">
           {colorList.map((_data) => (
             <ColorPaletteThumbnail
               key={`colorPalette-thumbnail-${_data.id}`}
@@ -183,7 +184,7 @@ const ColorPaletteWidget: React.FC<ColorPaletteWidgetProps> = ({ data }) => {
               }}
             />
           ))}
-        </Row>
+        </div>
         <ColorPaletteOpacitySlider
           data={{
             "data-item-type": "opacity",
@@ -204,7 +205,7 @@ const ColorPaletteWidget: React.FC<ColorPaletteWidgetProps> = ({ data }) => {
             }}
           />
         )}
-      </Col>
+      </div>
     </div>
   );
 };
@@ -237,14 +238,29 @@ const ColorPaletteThumbnail: React.FC<{
       className={[alignStyles.absoluteCenter, alignStyles.wrapTrue].join(" ")}
     >
       <div
+        data-tooltip-target="tooltip-color"
+        data-tooltip-placement="bottom"
         onClick={onClickColorBlock}
-        style={{ width: 20, height: 20, backgroundColor: data.colorCode }}
-      />
-      <Figure.Caption
+        className="flex items-center justify-center rounded-lg border-2 border-gray-200  cursor-pointer transition-all duration-300"
+        style={{ width: 40, height: 40 }}
+      >
+        <div
+          style={{ backgroundColor: data.colorCode }}
+          className="duration-300 hover:scale-90 w-full h-full rounded-md"
+        />
+      </div>
+      <div
+        id="tooltip-color"
+        role="tooltip"
+        className="duration-300 transition-opacity absolute z-10 invisible text-[#333] inline-block px-2 py-1 text-xs font-medium bg-gray-50 bshadow rounded-lg shadow-sm opacity-0 tooltip"
+      >
+        {`${data.colorCode}`}
+      </div>
+      {/*   <Figure.Caption
         className={[fontStyles.fontHalf1em, "text-center"].join(" ")}
       >
         {`${data.colorCode}`}
-      </Figure.Caption>
+      </Figure.Caption> */}
     </Figure>
   );
 };

@@ -7,6 +7,7 @@ export type DataFeed = {
   csv: string;
   dataFeed: unknown[];
   dataFeedTemplatePreviewImages: string[];
+  dataFeedVariables: string[];
   loading: boolean;
 };
 
@@ -15,6 +16,7 @@ const initialDataFeed: DataFeed = {
   dataFeed: [],
   loading: false,
   dataFeedTemplatePreviewImages: [],
+  dataFeedVariables: ["price", "sale_price", "title", "description"],
 };
 
 export const dataFeedSlice = createSlice({

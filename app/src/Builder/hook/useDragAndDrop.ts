@@ -47,7 +47,6 @@ const useDragAndDrop = (
     let source = data.src;
 
     source = data.src;
-    console.log("DATATATAATATA:", data);
     imageSrc.onload = () => {
       let width;
       let height;

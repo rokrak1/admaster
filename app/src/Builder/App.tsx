@@ -64,7 +64,8 @@ function App() {
     transformer,
     clearHistory
   );
-  const { stageData } = useItem();
+  const { prerenderItems, stageData } = useItem();
+
   const { initializeFileDataList, updateFileData } = useStageDataList();
   const stage = useStage();
   const modal = useModal();
@@ -86,7 +87,6 @@ function App() {
     const { id } = item.attrs;
     const target =
       item.attrs["data-item-type"] === "frame" ? item.getParent() : item;
-    console.log("stageData:", stageData);
     return {
       id: nanoid(),
       attrs: {
@@ -149,7 +149,14 @@ function App() {
         />
       ))}
     </NavBar> */
-    <Navigation data={workModeList} onClick={getClickCallback} />
+    <Navigation
+      data={workModeList}
+      onClick={getClickCallback}
+      stageRef={stage.stageRef}
+      stageData={stageData}
+      clearSelection={clearSelection}
+      selectedItems={selectedItems}
+    />
   );
 
   const hotkeyModal = (
@@ -395,12 +402,10 @@ function App() {
     const transformerNode = transformer.transformerRef.current;
     if (transformerNode) {
       transformerNode.on("transformstart", (e) => {
-        console.log("Resize or rotate start", e);
         setShowPopup(false);
       });
 
       transformerNode.on("transformend", (e) => {
-        console.log("Resize or rotate end", e);
         setShowPopup(true);
       });
 
@@ -409,12 +414,15 @@ function App() {
         transformerNode.off("transformend");
       };
     }
-    document.addEventListener("keydown", function (event) {
-      if (event.key === "ArrowUp" && event.shiftKey) {
-        console.log("Shift + ArrowUp simulated event detected.");
-        // Your logic here
-      }
-    });
+  }, []);
+
+  useEffect(() => {
+    // Prerender stageData
+    let dataFromLocalStorage = localStorage.getItem("template");
+    if (dataFromLocalStorage) {
+      let parsedJson = JSON.parse(dataFromLocalStorage);
+      prerenderItems(parsedJson);
+    }
   }, []);
 
   return (

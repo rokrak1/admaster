@@ -75,6 +75,9 @@ const useItem = () => {
   const clearItems = () => {
     dispatch(stageDataAction.clearItems({}));
   };
+  const prerenderItems = (data: StageData[]) => {
+    dispatch(stageDataAction.prerenderData(data));
+  };
 
   return {
     stageData,
@@ -83,6 +86,7 @@ const useItem = () => {
     removeItem,
     alterItems,
     clearItems,
+    prerenderItems,
   };
 };
 

@@ -73,7 +73,6 @@ const useHotkeyFunc = () => {
     selectedItems: Node<NodeConfig>[],
     createStageDataObject: (item: Node<NodeConfig>) => StageData
   ) => {
-    console.log("selitems: ", selectedItems);
     selectedItems
       .map((item) => createStageDataObject(item))
       /* .sort((a, b) => {

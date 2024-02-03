@@ -15,16 +15,22 @@ import cloneDeep from "lodash/cloneDeep";
 import { useDispatch, useSelector } from "react-redux";
 import { dataFeedAction } from "@/Builder/../redux/dataFeed";
 import useImageAsset from "@/Builder/hook/useImageAsset";
-import { stageDataSelector } from "@/Builder/../redux/currentStageData";
+import {
+  StageData,
+  stageDataSelector,
+} from "@/Builder/../redux/currentStageData";
+import { motion } from "framer-motion";
+import { PreviewIcon, SaveIcon } from "@/common/icons";
 
 export type ExportKind = {
   "data-item-type": string;
   id: string;
-  icon: string;
+  icon?: string;
   name: string;
   selectedItems: Node<NodeConfig>[];
   clearSelection: ReturnType<typeof useSelection>["clearSelection"];
   stageRef: ReturnType<typeof useStage>["stageRef"];
+  stageData: StageData[];
 };
 
 type ExportWidgetProps = {
@@ -39,7 +45,6 @@ const ExportWidget: React.FC<ExportWidgetProps> = ({ data }) => (
           key={`export-thumbnail-${_data.id}`}
           data={{
             id: _data.id,
-            icon: _data.icon,
             name: _data.name,
             "data-item-type": "export",
             selectedItems: data.selectedItems,
@@ -54,9 +59,10 @@ const ExportWidget: React.FC<ExportWidgetProps> = ({ data }) => (
 
 export default ExportWidget;
 
-const ExportThumbnail: React.FC<{
+export const ExportThumbnail: React.FC<{
   data: ExportKind;
 }> = ({ data }) => {
+  console.log("data:", data);
   const dispatch = useDispatch();
   const { getTranslation } = useI18n();
   const { getImageAssetSrc } = useImageAsset();
@@ -324,30 +330,41 @@ const ExportThumbnail: React.FC<{
     xhr.send();
   };
 
-  const onClickDownload = (exportId: string) => () => {
-    if (exportId === "export-all-frame") {
-      downloadAll();
-      return;
-    }
-    downloadSelected();
+  const onClickDownload = () => {
+    downloadAll();
+    // downloadSelected();
+  };
+
+  const saveTemplate = () => {
+    console.log(data.stageData);
+    localStorage.setItem("template", JSON.stringify(data.stageData));
   };
 
   return (
     <Figure
       as={Col}
-      onClick={onClickDownload(data.id)}
       className={[alignStyles.absoluteCenter, alignStyles.wrapTrue].join(" ")}
     >
-      <i className={`bi-${data.icon}`} style={{ fontSize: 20, width: 25 }} />
-      <Figure.Caption
-        className={[
-          fontStyles.font075em,
-          sizeStyles.width100,
-          "text-center",
-        ].join(" ")}
-      >
-        {`${getTranslation("widget", "export", data.id, "name")}`}
-      </Figure.Caption>
+      <div className="flex gap-x-2">
+        <motion.button
+          onClick={onClickDownload}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.9 }}
+          className="flex gap-x-2 px-2 items-center py-1 rounded-md bshadow bg-gradient-to-r from-blue-400 from-0% to-indigo-400 to-100% text-white font-semibold"
+        >
+          <PreviewIcon color="white" />
+          Preview
+        </motion.button>
+        <motion.button
+          onClick={saveTemplate}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.9 }}
+          className="flex gap-x-2 px-2 items-center py-1 rounded-md bshadow bg-gradient-to-r from-teal-400 from-0% to-emerald-400 to-100% text-white font-semibold"
+        >
+          <SaveIcon color="white" />
+          Save
+        </motion.button>
+      </div>
     </Figure>
   );
 };
