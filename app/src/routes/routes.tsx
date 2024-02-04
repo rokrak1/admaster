@@ -1,20 +1,24 @@
 import { createBrowserRouter, Link, RouteObject } from "react-router-dom";
-import DashboardContainer from "./Dashboard/DashboardContainer";
+import DashboardContainer from "../Dashboard/DashboardContainer";
 import {
   PaintBrushIcon,
   Cog6ToothIcon,
   Squares2X2Icon,
 } from "@heroicons/react/24/outline";
-import CatalogsContainer from "./Dashboard/Catalogs/CatalogsContainer";
-import SettingsContainer from "./Dashboard/Settings/SettingsContainer";
+import CatalogsContainer from "../Dashboard/Catalogs/CatalogsContainer";
+import SettingsContainer from "../Dashboard/Settings/SettingsContainer";
 import { ForwardRefExoticComponent, SVGProps } from "react";
-import TemplatesContainer from "./Dashboard/Template/TemplatesContainer";
-import AppWrapper from "./Builder/AppWrapper";
+import TemplatesContainer from "../Dashboard/Template/TemplatesContainer";
+import AppWrapper from "../Builder/AppWrapper";
+import ProtectedRoute from "./ProtectedRoute";
+import Login from "@/Authentication/Login";
+import Registration from "@/Authentication/Registration";
 
 interface IRouteConfiguration {
   name: string;
   path: string;
   element: JSX.Element;
+  protected: boolean;
   children?: IRouteConfiguration[];
   showOnSidebar: boolean;
   Icon?: any;
@@ -25,11 +29,13 @@ const routesConfiguration: IRouteConfiguration[] = [
     name: "Dashboard",
     path: "/",
     element: <DashboardContainer />,
+    protected: true,
     showOnSidebar: false,
     children: [
       {
         name: "Catalogs",
         path: "catalogs",
+        protected: true,
         element: <CatalogsContainer />,
         showOnSidebar: true,
         Icon: Squares2X2Icon,
@@ -37,6 +43,7 @@ const routesConfiguration: IRouteConfiguration[] = [
       {
         name: "Templates",
         path: "templates",
+        protected: true,
         element: <TemplatesContainer />,
         showOnSidebar: true,
         Icon: PaintBrushIcon,
@@ -44,6 +51,7 @@ const routesConfiguration: IRouteConfiguration[] = [
       {
         name: "Settings",
         path: "settings",
+        protected: true,
         element: <SettingsContainer />,
         showOnSidebar: true,
         Icon: Cog6ToothIcon,
@@ -53,14 +61,40 @@ const routesConfiguration: IRouteConfiguration[] = [
   {
     name: "Builder",
     path: "builder",
+    protected: true,
     element: <AppWrapper />,
+    showOnSidebar: false,
+  },
+  {
+    name: "Login",
+    path: "login",
+    protected: false,
+    element: <Login />,
+    showOnSidebar: false,
+  },
+  {
+    name: "Register",
+    path: "register",
+    protected: false,
+    element: <Registration />,
+    showOnSidebar: false,
+  },
+  {
+    name: "404",
+    path: "*",
+    protected: false,
+    element: <Login />,
     showOnSidebar: false,
   },
 ];
 
 const getRouteProps = (route: IRouteConfiguration): RouteObject => ({
   path: route.path,
-  element: route.element,
+  element: route.protected ? (
+    <ProtectedRoute>{route.element}</ProtectedRoute>
+  ) : (
+    route.element
+  ),
   children: route.children?.map((child) => getRouteProps(child)) || [],
 });
 

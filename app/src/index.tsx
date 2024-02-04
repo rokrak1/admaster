@@ -6,7 +6,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import configureKonvaEditorStore from "./redux/store";
 import "./i18n";
 import { RouterProvider } from "react-router-dom";
-import { router } from "./routes";
+import { router } from "./routes/routes";
 
 const store = configureKonvaEditorStore();
 
