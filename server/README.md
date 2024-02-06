@@ -55,3 +55,8 @@ uvicorn main:app --reload
 - `main`: the file where your FastAPI app is created.
 - `app`: the FastAPI instance.
 - `--reload`: makes the server restart after code changes. Only use this for development.
+
+# Info about tokens
+
+Access and refresh tokens are both send as HttpOnly cookie. This is done because supabase session_generation besides to refresh token also needs access token even if one is expired.
+So instead of saving acces token in variable (which is reseted on page refresh) or local storage (which is vulnerable to XXS attacks) we save it as cookie.

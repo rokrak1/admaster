@@ -1,7 +1,8 @@
+import { me } from "@/api/auth";
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
-interface IUser {
+export interface IUser {
   id: string;
   contact_email: string;
   name: string;
@@ -16,11 +17,13 @@ interface IUser {
 interface AuthContextType {
   user: IUser | null;
   setUser: React.Dispatch<React.SetStateAction<IUser | null>>;
+  setUserAndRoute: (data: { user: IUser }, route: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   setUser: () => {},
+  setUserAndRoute: () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -30,26 +33,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<IUser | null>(null);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const currentPath =
+    pathname !== "/login" && pathname !== "/register" ? pathname : "/";
+
+  const setUserAndRoute = ({ user }: { user: IUser }, route: string) => {
+    setUser(user);
+    navigate(route);
+  };
 
   useEffect(() => {
     const checkUser = async () => {
-      try {
-        const response = await fetch("/api/me");
-        if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
-        } else {
-          navigate("/login");
-        }
-      } catch (error) {
-        console.error("Authentication check failed", error);
+      let [data, err] = await me();
+      if (err) {
         navigate("/login");
+        return;
       }
+      setUserAndRoute(data!, currentPath);
     };
 
     checkUser();
-  }, [navigate]);
+  }, []);
 
-  const value = { user, setUser };
+  const value = { user, setUser, setUserAndRoute };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

@@ -12,6 +12,8 @@ import dataFeedReducer, { DataFeed } from "./dataFeed";
 import modalsReducer, { Modals } from "./modals";
 import popupReducer, { Popup } from "./popup";
 import configReducer, { Config } from "./config";
+import userReducer, { UserSlice } from "./user";
+import dataReducer, { DataSlice } from "./data";
 
 export type StoreState = {
   fileMeta: FileMeta;
@@ -22,6 +24,8 @@ export type StoreState = {
   modals: Modals;
   popup: Popup;
   config: Config;
+  user: UserSlice;
+  data: DataSlice;
 };
 
 const epicMiddleware = createEpicMiddleware();
@@ -39,6 +43,8 @@ const configureKonvaEditorStore = (preloadedState?: StoreState) => {
       modals: modalsReducer,
       popup: popupReducer,
       config: configReducer,
+      user: userReducer,
+      data: dataReducer,
     },
     middleware: getDefaultMiddleware({ serializableCheck: false }).concat(
       epicMiddleware

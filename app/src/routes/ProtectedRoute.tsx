@@ -1,14 +1,16 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/auth.context";
+import Loader from "./Loader";
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { user } = useAuth();
-
+  const { user, accessToken, setUserAndRoute } = useAuth();
+  console.log("protected route", user);
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return (
+      <Loader accessToken={accessToken} setUserAndRoute={setUserAndRoute} />
+    );
   }
 
   return <>{children}</>;

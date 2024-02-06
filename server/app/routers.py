@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException, APIRouter, Security, Depends
 from fastapi.security import OAuth2PasswordBearer
 from starlette.status import HTTP_401_UNAUTHORIZED
-from app.auth import validate_access_token
+from app.middlewares.auth import validate_access_token
 
 print("TEST")
 

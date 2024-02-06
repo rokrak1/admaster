@@ -2,6 +2,8 @@ import { PlusIcon } from "@heroicons/react/20/solid";
 import ModalWrapper from "./ModalWrapper";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { modalsAction } from "@/redux/modals";
 
 const tabs = [
   { name: "Popular", href: "#", current: true },
@@ -16,6 +18,10 @@ function classNames(...classes) {
 }
 
 const TemplatesPickerModal: React.FC = () => {
+  const dispatch = useDispatch();
+  const closeModal = () => {
+    dispatch(modalsAction.clearModal());
+  };
   return (
     <ModalWrapper>
       <div className=" pb-2 sm:pb-0">
@@ -66,6 +72,7 @@ const TemplatesPickerModal: React.FC = () => {
         className=" cursor-pointer bshadow w-32 h-32 bg-gray-200 rounded-xl"
       >
         <Link
+          onClick={closeModal}
           className="w-full h-full flex flex-col items-center justify-center no-underline"
           to="../builder"
         >

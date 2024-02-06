@@ -21,6 +21,8 @@ import {
 } from "@/Builder/../redux/currentStageData";
 import { motion } from "framer-motion";
 import { PreviewIcon, SaveIcon } from "@/common/icons";
+import { createTemplate } from "@/api/template";
+import { toast } from "react-toastify";
 
 export type ExportKind = {
   "data-item-type": string;
@@ -31,6 +33,7 @@ export type ExportKind = {
   clearSelection: ReturnType<typeof useSelection>["clearSelection"];
   stageRef: ReturnType<typeof useStage>["stageRef"];
   stageData: StageData[];
+  templateName: string;
 };
 
 type ExportWidgetProps = {
@@ -335,9 +338,22 @@ export const ExportThumbnail: React.FC<{
     // downloadSelected();
   };
 
-  const saveTemplate = () => {
-    console.log(data.stageData);
-    localStorage.setItem("template", JSON.stringify(data.stageData));
+  const saveTemplate = async () => {
+    let name = data.templateName;
+    console.log(name);
+
+    if (!name) {
+      return;
+    }
+    console.log("stageData:", data.stageData);
+    let [res, err] = await createTemplate(name, data.stageData);
+    if (err) {
+      toast.error("Error saving template");
+      return;
+    }
+
+    // push template to the others
+    toast.success(" Template saved");
   };
 
   return (

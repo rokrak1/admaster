@@ -17,7 +17,6 @@ import {
   ArrowDownOnSquareStackIcon,
   ArrowUpOnSquareStackIcon,
 } from "@heroicons/react/24/outline";
-import { PreviewIcon, SaveIcon } from "@/common/icons";
 import { ExportThumbnail } from "../settingBar/widgetList/ExportWidget";
 import { Stage } from "konva/lib/Stage";
 import { Node, NodeConfig } from "konva/lib/Node";
@@ -41,11 +40,12 @@ const Navigation: React.FC<NavBarButtonProps> = ({
   stageRef,
   stageData,
 }) => {
+  const [templateName, setTemplateName] = React.useState("New template");
   return (
     <div className="h-[60px] w-full bshadow gap-x-10 flex items-center justify-between p-3 bg-gradient-to-r from-indigo-500 from-0% to-blue-500 to-100%">
       <div className="w-full flex  items-center h-full gap-x-10">
         <span>
-          <Link to="../" className="text-white no-underline">
+          <Link to="../templates" className="text-white no-underline">
             <motion.div
               whileHover={{
                 x: [0, -5, 0],
@@ -227,6 +227,15 @@ const Navigation: React.FC<NavBarButtonProps> = ({
         </div>
       </div>
 
+      <input
+        value={templateName}
+        onChange={(e) => setTemplateName(e.target.value)}
+        type="text"
+        placeholder="Template name"
+        max={50}
+        className="duration-300 w-1/3 h-10 rounded-md border-0 p-3 bg-white/75 text-lg font-medium max-w-[300px] placeholder-gray-400 focus:ring-2 focus:ring-indigo-700 focus:ring-offset-1 focus:ring-offset-white focus:ring-opacity-50"
+      />
+
       <ExportThumbnail
         data={{
           id: "export",
@@ -236,6 +245,7 @@ const Navigation: React.FC<NavBarButtonProps> = ({
           clearSelection,
           stageRef,
           stageData,
+          templateName,
         }}
       />
     </div>

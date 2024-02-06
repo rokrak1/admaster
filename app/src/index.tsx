@@ -1,12 +1,12 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux";
 import "./index.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import configureKonvaEditorStore from "./redux/store";
 import "./i18n";
-import { RouterProvider } from "react-router-dom";
-import { router } from "./routes/routes";
+import App from "./App";
+import { AuthProvider } from "./context/auth.context";
+import { BrowserRouter } from "react-router-dom";
 
 const store = configureKonvaEditorStore();
 
@@ -18,6 +18,10 @@ if (rootElement === null) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <Provider store={store}>
-    <RouterProvider router={router} />
+    <BrowserRouter>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </BrowserRouter>
   </Provider>
 );

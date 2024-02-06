@@ -4,10 +4,12 @@ export const MODALS_PREFIX = "modals";
 
 export type Modals = {
   modal: string;
+  modalData?: any;
 };
 
 const initialModals: Modals = {
   modal: "",
+  modalData: null,
 };
 
 export const modalsSlice = createSlice({
@@ -19,6 +21,10 @@ export const modalsSlice = createSlice({
     },
     clearModal(state) {
       state.modal = "";
+    },
+    setModalAndData(state, action) {
+      state.modalData = action.payload.modalData;
+      state.modal = action.payload.modal;
     },
   },
 });

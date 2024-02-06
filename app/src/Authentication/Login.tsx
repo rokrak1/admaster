@@ -1,6 +1,35 @@
-import { Link } from "react-router-dom";
+import { login } from "@/api/auth";
+import { useAuth } from "@/context/auth.context";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Login = () => {
+  const [loading, setLoading] = useState(false);
+  const { setUserAndRoute } = useAuth();
+  const navigate = useNavigate();
+  const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
+    setLoading(true);
+
+    e.preventDefault();
+
+    let email = e.currentTarget.email.value;
+    let password = e.currentTarget.password.value;
+
+    if (!email || !password) {
+      setLoading(false);
+      return;
+    }
+
+    let [data, err] = await login(email, password);
+    if (err) {
+      setLoading(false);
+      toast.error("Invalid email or password");
+      return;
+    }
+    setUserAndRoute(data!, "/");
+    setLoading(false);
+  };
   return (
     <>
       {/*
@@ -25,7 +54,7 @@ const Login = () => {
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
           <div className="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
-            <form className="space-y-6" action="#" method="POST">
+            <form className="space-y-6" onSubmit={handleSignIn}>
               <div>
                 <label
                   htmlFor="email"
@@ -95,7 +124,7 @@ const Login = () => {
                   type="submit"
                   className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
-                  Sign in
+                  {loading ? "Loading" : "Sign in"}
                 </button>
               </div>
             </form>

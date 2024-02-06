@@ -1,20 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Sidebar from "./Sidebar/Sidebar";
 import { Outlet } from "react-router-dom";
-import { modals } from "./Modals/modals";
-import { useSelector } from "react-redux";
-import { StoreState } from "@/redux/store";
+import { useDispatch } from "react-redux";
+import { dataActions } from "@/redux/data";
 
 const DashboardContainer = () => {
-  const modal = useSelector((state: StoreState) => state.modals.modal);
+  const dispatch = useDispatch();
 
-  const getModal = (modal: string) => {
-    if (modal) {
-      const Modal = modals[modal];
-      return <Modal />;
-    }
-    return null;
-  };
+  useEffect(() => {
+    dispatch(dataActions.initializeTemplates());
+  }, []);
+
   return (
     <div className="flex h-full bg-gray-50">
       <Sidebar />
@@ -22,8 +18,6 @@ const DashboardContainer = () => {
         <div className=" w-full h-full  bg-white rounded-xl bshadow">
           <Outlet />
         </div>
-
-        {getModal(modal)}
       </div>
     </div>
   );

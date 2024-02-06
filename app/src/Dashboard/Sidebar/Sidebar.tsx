@@ -1,6 +1,6 @@
 import { Disclosure } from "@headlessui/react";
 import { ChevronRightIcon } from "@heroicons/react/20/solid";
-import { routes } from "@/routes/routes";
+import { routes } from "@/routes/routesConfiguration";
 import { Link, useLocation } from "react-router-dom";
 
 function classNames(...classes) {
