@@ -466,7 +466,9 @@ function App() {
           padding={5}
         />
       </View>
-      {showPopup && <Popup selectedItems={selectedItems} />}
+      {showPopup && (
+        <Popup selectedItems={selectedItems} onSelectItem={onSelectItem} />
+      )}
     </Layout>
   );
 }

@@ -21,13 +21,15 @@ import spaceStyles from "@/Builder/style/space.module.css";
 import displayStyles from "@/Builder/style/display.module.css";
 import positionStyles from "@/Builder/style/position.module.css";
 import alignStyles from "@/Builder/style/align.module.css";
-import fontStyles from "@/Builder/style/font.module.css";
 import { WidgetKind } from "../Widget";
 import { SettingBarProps } from "..";
 import useItem from "@/Builder/hook/useItem";
 import useLocalStorage from "@/Builder/hook/useLocalStorage";
 import useI18n from "@/Builder/hook/usei18n";
 import { OpacityIcon } from "@/common/icons";
+import { useContextMenu } from "@/Builder/hook/useContextMenu";
+import ContextMenuTemplates from "@/Builder/ContextMenu/TemplateActionsMenu";
+import { ColorsContextMenu } from "@/Builder/ContextMenu";
 
 export type ColorPaletteKind = {
   "data-item-type": string;
@@ -45,9 +47,18 @@ export const COLOR_LIST_KEY = "colorList";
 const ColorPaletteWidget: React.FC<ColorPaletteWidgetProps> = ({ data }) => {
   const { getValue, setValue } = useLocalStorage();
   const { updateItem } = useItem();
+  const { getTranslation } = useI18n();
+  const {
+    setClicked,
+    setContextData,
+    setCoords,
+    clicked,
+    coords,
+    contextData,
+  } = useContextMenu();
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [newColor, setNewColor] = useState<string>("#000000");
-  const { getTranslation } = useI18n();
+
   const [colorList, setColorList] = useState(() => {
     if (getValue(COLOR_LIST_KEY)) {
       return [...getValue(COLOR_LIST_KEY)!];
@@ -84,6 +95,13 @@ const ColorPaletteWidget: React.FC<ColorPaletteWidgetProps> = ({ data }) => {
       setValue(COLOR_LIST_KEY, newList);
       setColorList(newList);
     }
+  };
+
+  const removeColor = (id: string) => {
+    const newList = colorList.filter((color) => color.id !== id);
+    setValue(COLOR_LIST_KEY, newList);
+    setColorList(newList);
+    setClicked(false);
   };
 
   const onClearColorClick = (e: React.MouseEvent<HTMLElement>) => {
@@ -136,29 +154,6 @@ const ColorPaletteWidget: React.FC<ColorPaletteWidgetProps> = ({ data }) => {
               <i className="bi-plus text-black" />
             </Button>
           </OverlayTrigger>
-          <OverlayTrigger
-            placement="bottom"
-            overlay={
-              <Tooltip id="tooltip-clear-color">
-                {getTranslation("widget", "colorPalette", "clearColor", "name")}
-              </Tooltip>
-            }
-          >
-            <Button
-              className={[
-                colorStyles.transparentDarkColorTheme,
-                borderStyles.none,
-                displayStyles["inline-block"],
-                sizeStyles.width10,
-                spaceStyles.p0,
-                spaceStyles.ml1rem,
-                alignStyles["text-left"],
-              ].join(" ")}
-              onClick={onClearColorClick}
-            >
-              <i className="bi-x-circle text-black" />
-            </Button>
-          </OverlayTrigger>
         </h6>
         {showColorPicker && (
           <SketchPicker
@@ -182,6 +177,10 @@ const ColorPaletteWidget: React.FC<ColorPaletteWidgetProps> = ({ data }) => {
                 colorCode: _data.colorCode,
                 selectedItems: data.selectedItems,
               }}
+              setClicked={setClicked}
+              clicked={clicked}
+              setCoords={setCoords}
+              setContextData={setContextData}
             />
           ))}
         </div>
@@ -206,6 +205,13 @@ const ColorPaletteWidget: React.FC<ColorPaletteWidgetProps> = ({ data }) => {
           />
         )}
       </div>
+      {clicked && (
+        <ColorsContextMenu
+          top={coords.y}
+          left={coords.x}
+          removeColor={() => removeColor(contextData!.colorId)}
+        />
+      )}
     </div>
   );
 };
@@ -214,7 +220,17 @@ export default ColorPaletteWidget;
 
 const ColorPaletteThumbnail: React.FC<{
   data: ColorPaletteKind;
-}> = ({ data: { id, ...data } }) => {
+  clicked: boolean;
+  setCoords: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>;
+  setClicked: React.Dispatch<React.SetStateAction<boolean>>;
+  setContextData: React.Dispatch<React.SetStateAction<any>>;
+}> = ({
+  data: { id, ...data },
+  setClicked,
+  setContextData,
+  setCoords,
+  clicked,
+}) => {
   const { updateItem } = useItem();
 
   const onClickColorBlock = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -243,6 +259,22 @@ const ColorPaletteThumbnail: React.FC<{
         onClick={onClickColorBlock}
         className="flex items-center justify-center rounded-lg border-2 border-gray-200  cursor-pointer transition-all duration-300"
         style={{ width: 40, height: 40 }}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          if (clicked) {
+            setClicked(false);
+            return;
+          }
+          const { clientX, clientY } = e;
+          const boundingRect = e.target
+            .closest("#popup")
+            .getBoundingClientRect();
+          const adjustedX = clientX - boundingRect.left;
+          const adjustedY = clientY - boundingRect.top;
+          setContextData({ colorId: id });
+          setCoords({ x: adjustedX, y: adjustedY });
+          setClicked(true);
+        }}
       >
         <div
           style={{ backgroundColor: data.colorCode }}

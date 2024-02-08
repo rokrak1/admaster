@@ -16,6 +16,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --primaryColor: #5A4FCF;
+}
+
 * {
   box-sizing: border-box;
 }

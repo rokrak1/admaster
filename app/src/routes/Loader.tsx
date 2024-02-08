@@ -1,7 +1,9 @@
 import { me } from "@/api/auth";
+import { getCSSVariable } from "@/common";
 import { IUser } from "@/context/auth.context";
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { BarLoader } from "react-spinners";
 
 interface Props {
   setUserAndRoute: (data: { user: IUser }, route: string) => void;
@@ -30,8 +32,18 @@ const Loader: React.FC<Props> = ({ setUserAndRoute }) => {
   }, [navigate, setUserAndRoute]);
 
   return (
-    <div>
-      <div>Loading...</div>
+    <div className="w-full h-full flex items-center justify-center">
+      <BarLoader
+        color={getCSSVariable("primaryColor")}
+        loading={true}
+        width={120}
+        cssOverride={{
+          borderRadius: "10px",
+        }}
+        height={10}
+        aria-label="Loading Spinner"
+        data-testid="loader"
+      />
     </div>
   );
 };

@@ -1,24 +1,25 @@
-import useItem from "@/Builder/hook/useItem";
 import { fetchTemplates } from "@/api/template";
 import { BrokenImageIcon } from "@/common/icons";
-import { dataActions } from "@/redux/data";
-import { StoreState } from "@/redux/store";
+import { CustomerTemplate, dataActions } from "@/redux/data";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AnimatePresence, motion } from "framer-motion";
 import { modalsAction } from "@/redux/modals";
 import { Modals } from "../Modals/modals";
-import ContextMenuTemplates from "@/Builder/ContextMenu/ContextMenuTempaltes";
+import ContextMenuTemplates from "@/Builder/ContextMenu/TemplateActionsMenu";
 import { useContextMenu } from "@/Builder/hook/useContextMenu";
+import { TemplateContextMenu } from "@/Builder/ContextMenu";
 
-const TemplatesList = () => {
+const TemplatesList: React.FC<{
+  templates: CustomerTemplate[];
+  showFirstOption: boolean;
+}> = ({ templates, showFirstOption }) => {
   const [loading, setLoading] = useState(true);
   let [showLine, setShowLine] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
   const navigate = useNavigate();
-  const templates = useSelector((state: StoreState) => state.data.templates);
   const dispatch = useDispatch();
   const { clicked, setClicked, coords, setCoords } = useContextMenu();
 
@@ -35,10 +36,7 @@ const TemplatesList = () => {
     dispatch(modalsAction.setModal(Modals.TEMPLATE_PICKER));
   };
 
-  // TODO: Add font family option on text widget
   // TODO: (not urgent) Add grouping
-  // TODO: Sidebar highlight on selected route
-  // TODO: Implement Spinner on loading
 
   // Proceed to cdn implementation
 
@@ -100,30 +98,32 @@ const TemplatesList = () => {
         ) : (
           <div className="flex flex-col text-gray-400 items-center justify-center w-ful h-full">
             <div>No templates found.</div>
-            <a
-              onMouseOver={() => setShowLine(true)}
-              onMouseLeave={() => setShowLine(false)}
-              onClick={showTemplateModal}
-              className="text-lg font-medium cursor-pointer no-underline text-indigo-600 w-max relative"
-            >
-              <span>Create your first template!</span>
-              <AnimatePresence>
-                {showLine && (
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: 220 }}
-                    exit={{ width: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="absolute h-[2px] bottom-0 rounded-full bg-indigo-600 mt-2"
-                  ></motion.div>
-                )}
-              </AnimatePresence>
-            </a>
+            {showFirstOption && (
+              <a
+                onMouseOver={() => setShowLine(true)}
+                onMouseLeave={() => setShowLine(false)}
+                onClick={showTemplateModal}
+                className="text-lg font-medium cursor-pointer no-underline text-indigo-600 w-max relative"
+              >
+                <span>Create your first template!</span>
+                <AnimatePresence>
+                  {showLine && (
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: 220 }}
+                      exit={{ width: 0 }}
+                      transition={{ duration: 0.5 }}
+                      className="absolute h-[2px] bottom-0 rounded-full bg-indigo-600 mt-2"
+                    ></motion.div>
+                  )}
+                </AnimatePresence>
+              </a>
+            )}
           </div>
         )}
       </div>
       {clicked && (
-        <ContextMenuTemplates
+        <TemplateContextMenu
           top={coords.y}
           left={coords.x}
           selectedTemplateId={selectedTemplateId}

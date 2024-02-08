@@ -62,12 +62,13 @@ const AppWrapper = () => {
         OPEN
       </button> */}
       <App />
-      {dataFeedTemplatePreviewImages.length && previewOpened && (
+      {(dataFeedTemplatePreviewImages.length && previewOpened && (
         <TemplatePreview
           urls={dataFeedTemplatePreviewImages}
           setPreviewOpened={setPreviewOpened}
         />
-      )}
+      )) ||
+        null}
     </div>
   );
 };

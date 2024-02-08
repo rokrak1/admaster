@@ -1,8 +1,13 @@
 import { useEffect, useState } from "react";
 
+interface ContextData {
+  [key: string]: any;
+}
+
 export const useContextMenu = () => {
   // boolean value to determine if the user has right clicked
   const [clicked, setClicked] = useState(false);
+  const [contextData, setContextData] = useState<ContextData>({});
   // allows us to track the x,y coordinates of the users right click
   const [coords, setCoords] = useState({
     x: 0,
@@ -24,10 +29,16 @@ export const useContextMenu = () => {
     };
   }, []);
 
+  useEffect(() => {
+    console.log("contextmenu:", clicked, contextData);
+  }, [clicked, contextData]);
+
   return {
     clicked,
     setClicked,
     coords,
     setCoords,
+    contextData,
+    setContextData,
   };
 };

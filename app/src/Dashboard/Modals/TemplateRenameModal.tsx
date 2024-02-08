@@ -36,7 +36,10 @@ export default function TemplateRenameModal() {
       closeModal();
       return;
     }
+
     dispatch(dataActions.updateTemplate(res));
+    closeModal();
+    toast.success("Template renamed");
   };
 
   const cancelButtonRef = useRef(null);

@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { DeleteIcon, DuplicateIcon, EditIcon } from "@/common/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { Modals } from "@/Dashboard/Modals/modals";
@@ -9,29 +8,12 @@ import { StoreState } from "@/redux/store";
 import { createTemplate } from "@/api/template";
 import { toast } from "react-toastify";
 
-export const menuData = [
-  {
-    id: 1,
-    name: "option 1",
-  },
-  {
-    id: 2,
-    name: "option 2",
-  },
-  {
-    id: 3,
-    name: "option 3",
-  },
-];
-
-const ContextMenuTemplates = ({
-  top,
-  left,
-  selectedTemplateId,
-}: {
-  top: number;
-  left: number;
+export interface TemplateActionsMenuProps {
   selectedTemplateId: string;
+}
+
+const TemplateActionsMenu: React.FC<TemplateActionsMenuProps> = ({
+  selectedTemplateId,
 }) => {
   const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
   const { templates } = useSelector((state: StoreState) => ({
@@ -78,42 +60,28 @@ const ContextMenuTemplates = ({
 
   return (
     <>
-      <motion.ul
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{
-          opacity: 1,
-          scale: 1,
-          transition: { type: "tween", stiffness: 200, duration: 0.1 },
-        }}
-        className="fixed p-2 bg-white text-gray-600 font-semibold text-sm  border border-gray-50 rounded-lg z-50 "
-        style={{
-          top,
-          left,
-        }}
+      <li
+        onClick={handleRenameClick}
+        className="flex gap-x-2 px-3 items-center p-2 cursor-pointer hover:bg-gray-100 rounded-lg duration-150 hover:text-black"
       >
-        <li
-          onClick={handleRenameClick}
-          className="flex gap-x-2 px-3 items-center p-2 cursor-pointer hover:bg-gray-100 rounded-lg duration-150 hover:text-black"
-        >
-          <EditIcon size={16} color={"#4b5563"} />
-          Rename
-        </li>
-        <li
-          onClick={handleDuplicateClick}
-          className="flex gap-x-2 px-3 items-center p-2 cursor-pointer hover:bg-gray-100 rounded-lg duration-150 hover:text-black"
-        >
-          <DuplicateIcon size={16} color={"#4b5563"} />
-          Duplicate
-        </li>
-        <li
-          onClick={handleDeleteClick}
-          className="flex gap-x-2 px-3 items-center p-2 cursor-pointer hover:bg-gray-100 rounded-lg duration-150 hover:text-black"
-        >
-          <DeleteIcon size={16} color={"#4b5563"} />
-          Delete
-        </li>
-      </motion.ul>
+        <EditIcon size={16} color={"#4b5563"} />
+        Rename
+      </li>
+      <li
+        onClick={handleDuplicateClick}
+        className="flex gap-x-2 px-3 items-center p-2 cursor-pointer hover:bg-gray-100 rounded-lg duration-150 hover:text-black"
+      >
+        <DuplicateIcon size={16} color={"#4b5563"} />
+        Duplicate
+      </li>
+      <li
+        onClick={handleDeleteClick}
+        className="flex gap-x-2 px-3 items-center p-2 cursor-pointer hover:bg-gray-100 rounded-lg duration-150 hover:text-black"
+      >
+        <DeleteIcon size={16} color={"#4b5563"} />
+        Delete
+      </li>
     </>
   );
 };
-export default ContextMenuTemplates;
+export default TemplateActionsMenu;

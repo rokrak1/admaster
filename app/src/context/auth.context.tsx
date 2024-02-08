@@ -1,4 +1,5 @@
 import { me } from "@/api/auth";
+import { getCSSVariable } from "@/common";
 import path from "path";
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -64,7 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     return (
       <div className="w-full h-full flex items-center justify-center">
         <BarLoader
-          color={"#5A4FCF"}
+          color={getCSSVariable("primaryColor")}
           loading={isLoading}
           width={120}
           cssOverride={{

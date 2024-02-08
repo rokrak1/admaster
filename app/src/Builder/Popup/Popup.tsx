@@ -1,18 +1,19 @@
 import { Node, NodeConfig } from "konva/lib/Node";
 import { Widgets, WidgetsEnum } from "../settingBar";
-import {
-  AlignIcon,
-  ColorIcon,
-  DeleteIcon,
-  DuplicateIcon,
-  LayerDown,
-  LayerUp,
-} from "@/common/icons";
+import { AlignIcon, ColorIcon, FontIcon } from "@/common/icons";
 import { useState } from "react";
-import { popupTransformers, standardTransformers } from "./basicTransformers";
+import { popupTransformers } from "./basicTransformers";
+
+enum WidgetTypes {
+  text = "text",
+  shape = "shape",
+  image = "image",
+  icon = "icon",
+}
 
 interface PopupProps {
   selectedItems: Node<NodeConfig>[];
+  onSelectItem: (item: Node<NodeConfig>) => void;
 }
 
 interface iPopupIcon {
@@ -21,39 +22,58 @@ interface iPopupIcon {
   icon: React.FC<any>;
 }
 
-const popupIcons: iPopupIcon[] = [
+const textPopupWidgets: iPopupIcon[] = [
   {
-    id: WidgetsEnum.align,
-    name: "Align",
-    icon: AlignIcon,
+    id: WidgetsEnum.textPopup,
+    name: "Font family",
+    icon: FontIcon,
   },
+
   {
     id: WidgetsEnum.colorPalette,
     name: "Color Palette",
     icon: ColorIcon,
   },
+  {
+    id: WidgetsEnum.align,
+    name: "Align",
+    icon: AlignIcon,
+  },
 ];
+
+const widgetsList = {
+  [WidgetTypes.text]: textPopupWidgets,
+  [WidgetTypes.shape]: [],
+  [WidgetTypes.image]: [],
+  [WidgetTypes.icon]: [],
+};
 
 // TODO: LayerUp doesn't work
 // TODO: Add image background remover to image widget
-// TODO: popup to selected itemTypes
 // TODO: Implement Save function -> DB -> return 10 generated image for now i guess
 // Builder is fine for now i guess, I'll improve it later if needed
 
-const Popup: React.FC<PopupProps> = ({ selectedItems }) => {
+function isAvailablePopupType(itemType: string): itemType is WidgetTypes {
+  return Object.values(WidgetTypes).includes(itemType as WidgetTypes);
+}
+
+const Popup: React.FC<PopupProps> = ({ selectedItems, onSelectItem }) => {
   if (selectedItems.length !== 1) return null; // Ensure there's exactly one selected item
 
   const selectedItem = selectedItems[0];
   const { x, y, width, height } = selectedItem.getClientRect();
 
-  const popupX = x + width / 2 - 90;
-  const popupY = y - 80;
-
   const itemType = selectedItem.attrs["data-item-type"];
-  const availablePopupTypes = ["shape", "text", "image", "icon"];
+  if (!isAvailablePopupType(itemType)) return null;
+
+  const itemTypeWidgets = widgetsList[itemType as WidgetTypes];
+
+  const popupX = x + width / 2 - 46 - itemTypeWidgets.length * 23;
+  const popupY = y - 80;
 
   return (
     <div
+      id="popup"
       style={{
         position: "absolute",
         left: `${popupX}px`,
@@ -73,11 +93,12 @@ const Popup: React.FC<PopupProps> = ({ selectedItems }) => {
             <icon.icon color={"#333"} size={25} />
           </div>
         ))}
-        {popupIcons.map((icon) => (
+        {itemTypeWidgets.map((icon) => (
           <PopupComponentRenderer
             icon={icon}
             selectedItems={[selectedItem]}
             itemType={itemType}
+            onSelectItem={onSelectItem}
           />
         ))}
       </div>
@@ -91,7 +112,8 @@ const PopupComponentRenderer: React.FC<{
   icon: iPopupIcon;
   selectedItems: Node<NodeConfig>[];
   itemType: string;
-}> = ({ icon, selectedItems, itemType }) => {
+  onSelectItem: (items: Node<NodeConfig>) => void;
+}> = ({ icon, selectedItems, itemType, onSelectItem }) => {
   const [isOpened, setIsOpened] = useState<WidgetsEnum | null>(null);
   const { id, name } = icon;
   return (
@@ -104,7 +126,8 @@ const PopupComponentRenderer: React.FC<{
       }`}
     >
       <icon.icon color={"#333"} size={25} />
-      {isOpened && Widgets[id]({ selectedItems, id, name, itemType })}
+      {isOpened &&
+        Widgets[id]({ selectedItems, id, name, itemType, onSelectItem })}
     </div>
   );
 };

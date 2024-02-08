@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 export const DATA_PREFIX = "data";
 
-interface CustomerTemplate {
+export interface CustomerTemplate {
   id: string;
   created_at: Date;
   customer_id?: string | null;

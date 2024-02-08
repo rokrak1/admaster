@@ -24,11 +24,10 @@ export default function TemplateDeleteModal() {
     let [res, err] = await deleteTemplate(selectedTemplate.sequance);
 
     if (err) {
-      toast.error("Error renaming template");
+      toast.error("Error deleting template");
       closeModal();
       return;
     }
-    console.log("red:", res);
     dispatch(dataActions.removeTemplate(res));
     closeModal();
   };

@@ -10,7 +10,6 @@ import { StoreState } from "@/redux/store";
 
 const App = () => {
   const modal = useSelector((state: StoreState) => state.modals.modal);
-
   const getModal = (modal: string) => {
     if (modal) {
       const Modal = modals[modal];
@@ -18,7 +17,6 @@ const App = () => {
     }
     return null;
   };
-
   const renderRoutes = ({ routes }: { routes?: RouteObject[] }) =>
     routes?.length ? (
       <>

@@ -15,7 +15,7 @@ export const configSlice = createSlice({
   initialState: initialModals,
   reducers: {
     setModel(state, action) {
-      state.model = action.payload.visible;
+      state.model = action.payload;
     },
   },
 });

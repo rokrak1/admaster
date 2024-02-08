@@ -31,6 +31,7 @@ const useSelection = (transformer: ReturnType<typeof useTransformer>) => {
       setSelectedItems(itemList);
       return;
     }
+    console.log("eee:", e);
     if (!e) {
       return;
     }
@@ -46,7 +47,7 @@ const useSelection = (transformer: ReturnType<typeof useTransformer>) => {
       e.target.name() === "label-text"
         ? e.target.getParent().getParent().findOne(".label-target")
         : e.target;
-    if (!e.evt.shiftKey) {
+    if (!e.evt?.shiftKey) {
       newItemList = [targetItem];
     } else if (selectedItems.find((item) => item.id() === targetItem.id())) {
       newItemList = selectedItems.filter(

@@ -24,6 +24,14 @@ export type TextItemProps = OverrideItemProps<{
   setShowPopup: (val: boolean) => void;
 }>;
 
+export const measureTextWidth = (text, font) => {
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  context.font = font;
+  console.log(text, font, context.measureText(text));
+  return context.measureText(text).width;
+};
+
 const TextItem: React.FC<TextItemProps> = ({
   data,
   e,
@@ -41,15 +49,23 @@ const TextItem: React.FC<TextItemProps> = ({
       console.error("textRef is null");
       return;
     }
+
     textRef.current.hide();
     transformer.transformerRef.current!.hide();
     const textPosition = textRef.current.getAbsolutePosition();
     const stage = textRef.current.getStage();
     const container = stage!.container().getBoundingClientRect();
+    const padding = 5;
     const areaPosition = {
       x: container.x + textPosition.x,
       y: container.y + textPosition.y,
     };
+
+    const font = `${
+      textRef.current.fontSize() * stage!.scaleY() * textRef.current.scaleY()
+    }px ${textRef.current.fontFamily()}`;
+    const textWidth = measureTextWidth(textRef.current.text(), font);
+
     const textarea = document.createElement("textarea");
     document.body.appendChild(textarea);
 
@@ -62,7 +78,7 @@ const TextItem: React.FC<TextItemProps> = ({
     textarea.style.fontSize = `${
       textRef.current.fontSize() * stage!.scaleY() * textRef.current.scaleY()
     }px`;
-    textarea.style.width = `${textarea.value
+    /*   textarea.style.width = `${textarea.value
       .split("\n")
       .sort((a, b) => b.length - a.length)[0]
       .split("")
@@ -79,7 +95,9 @@ const TextItem: React.FC<TextItemProps> = ({
                 stage!.scaleY() *
                 textRef.current!.scaleY(),
         0
-      )}px`;
+      )}px`; */
+
+    textarea.style.width = `${textWidth + padding * 2}px`;
     textarea.style.height = `${
       textRef.current.height() + textRef.current.padding() * 2 + 5
     }px`;
@@ -137,24 +155,7 @@ const TextItem: React.FC<TextItemProps> = ({
     }
 
     function setTextareaWidth() {
-      let newWidth = textarea.value
-        .split("\n")
-        .sort((a, b) => b.length - a.length)[0]
-        .split("")
-        .reduce(
-          (acc, curr) =>
-            curr.charCodeAt(0) >= 32 && curr.charCodeAt(0) <= 126
-              ? acc +
-                textRef.current!.fontSize() *
-                  stage!.scaleY() *
-                  textRef.current!.scaleY() *
-                  (3 / 5)
-              : acc +
-                textRef.current!.fontSize() *
-                  stage!.scaleY() *
-                  textRef.current!.scaleY(),
-          0
-        );
+      let newWidth = measureTextWidth(textRef.current.text(), font);
       // some extra fixes on different browsers
       const isSafari = /^((?!chrome|android).)*safari/i.test(
         navigator.userAgent

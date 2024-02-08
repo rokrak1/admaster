@@ -6,7 +6,7 @@ import widgetList from "../config/widget.json";
 import FrameWidget from "./widgetList/FrameWidget";
 import ImageWidget from "./widgetList/ImageWidget";
 import ColorPaletteWidget from "./widgetList/ColorPaletteWidget";
-import TextWidget from "./widgetList/TextWidget";
+import TextWidget, { TextPopupWidget } from "./widgetList/TextWidget";
 import AlignWidget from "./widgetList/AlignWidget";
 import ExportWidget from "./widgetList/ExportWidget";
 import useSelection from "../hook/useSelection";
@@ -40,6 +40,7 @@ export enum WidgetsEnum {
   frame = "frame",
   shapes = "shapes",
   text = "text",
+  textPopup = "textPopup",
   line = "line",
   icons = "icons",
   export = "export",
@@ -61,6 +62,9 @@ export const Widgets: IWidgets = {
   frame: (data: WidgetKind & SettingBarProps) => <FrameWidget />,
   shapes: (data: WidgetKind & SettingBarProps) => <ShapeWidget />,
   text: (data: WidgetKind & SettingBarProps) => <TextWidget />,
+  textPopup: (data: WidgetKind & SettingBarProps) => (
+    <TextPopupWidget data={data} />
+  ),
   line: (data: WidgetKind & SettingBarProps) => <LineWidget />,
   icons: (data: WidgetKind & SettingBarProps) => <IconWidget />,
   export: (data: WidgetKind & SettingBarProps) => <ExportWidget data={data} />,
@@ -107,13 +111,6 @@ const SettingBar: React.FC<SettingBarProps> = (settingProps) => {
   const [hoveredItem, setHoveredItem] = useState<WidgetsEnum | null>(null);
   return (
     <aside className="h-full flex">
-      {/*   <Accordion>
-      {(widgetList as WidgetKind[]).map((data) => (
-        <Widget key={`widget-${data.id}`} data={{ ...data, ...settingProps }}>
-          {Widgets[data.id] && Widgets[data.id]({ ...data, ...settingProps })}
-        </Widget>
-      ))}
-    </Accordion> */}
       <div className="flex flex-col bg-[#18191B] h-full">
         {navItems.map((item, i) => (
           <div
