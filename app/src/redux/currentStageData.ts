@@ -5,7 +5,7 @@ import {
 } from "@reduxjs/toolkit";
 import { Epic, ofType } from "redux-observable";
 import { take, tap } from "rxjs";
-import { OverrideItemData } from "../hook/useItem";
+import { OverrideItemData } from "@/Builder/hook/useItem";
 import { StoreState } from "./store";
 
 export const STAGE_PREFIX = "STAGE";
@@ -35,7 +35,6 @@ export const stageDataSlice = createSlice({
       stageDataEntity.addMany(state, action.payload);
     },
     addItem(state, action) {
-      console.log(action.payload);
       if (Array.isArray(action.payload)) {
         stageDataEntity.addMany(state, action.payload);
         return;

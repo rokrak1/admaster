@@ -12,6 +12,7 @@ interface CustomerTemplate {
   thumbnail?: string | null;
   group?: string | null;
   parent_group?: string | null;
+  sequance: string;
 }
 
 export type DataSlice = {
@@ -46,7 +47,7 @@ export const dataSlice = createSlice({
     },
     removeTemplate(state, action) {
       state.templates = state.templates.filter(
-        (template) => template.id !== action.payload
+        (template) => template.id !== action.payload.id
       );
       localStorage.setItem("templates", JSON.stringify(state.templates));
     },

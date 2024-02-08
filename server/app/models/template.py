@@ -10,9 +10,6 @@ class CustomerTemplate(BaseModel):
     group: Optional[str] = None
     parent_group: Optional[str] = None
 
-class CustomerTemplateUpdate(CustomerTemplate):
-    id: UUID4 
-
 class CustomerTemplateDelete(BaseModel):
     id: UUID4 
 

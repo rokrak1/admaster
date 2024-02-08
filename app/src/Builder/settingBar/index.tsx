@@ -115,8 +115,9 @@ const SettingBar: React.FC<SettingBarProps> = (settingProps) => {
       ))}
     </Accordion> */}
       <div className="flex flex-col bg-[#18191B] h-full">
-        {navItems.map((item) => (
+        {navItems.map((item, i) => (
           <div
+            key={"settbar" + i}
             onMouseEnter={() => setHoveredItem(item.id)}
             onMouseLeave={() => setHoveredItem(null)}
             className={`flex flex-col items-center justify-center p-3 cursor-pointer relative

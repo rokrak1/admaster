@@ -1,6 +1,8 @@
 import { me } from "@/api/auth";
+import path from "path";
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { BarLoader, PacmanLoader } from "react-spinners";
 
 export interface IUser {
   id: string;
@@ -32,6 +34,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<IUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const currentPath =
@@ -46,14 +49,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const checkUser = async () => {
       let [data, err] = await me();
       if (err) {
+        setIsLoading(false);
         navigate("/login");
         return;
       }
       setUserAndRoute(data!, currentPath);
+      setIsLoading(false);
     };
-
-    checkUser();
+    if (pathname !== "/login" && pathname !== "/register") checkUser();
+    else setIsLoading(false);
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <BarLoader
+          color={"#5A4FCF"}
+          loading={isLoading}
+          width={120}
+          cssOverride={{
+            borderRadius: "10px",
+          }}
+          height={10}
+          aria-label="Loading Spinner"
+          data-testid="loader"
+        />
+      </div>
+    );
+  }
 
   const value = { user, setUser, setUserAndRoute };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

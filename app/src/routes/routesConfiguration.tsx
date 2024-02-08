@@ -2,6 +2,7 @@ import {
   createBrowserRouter,
   Link,
   Navigate,
+  Route,
   RouteObject,
 } from "react-router-dom";
 import DashboardContainer from "../Dashboard/DashboardContainer";
@@ -67,7 +68,7 @@ const dashboardRoutes: IRouteConfiguration[] = [
 const mainRoutes: IRouteConfiguration[] = [
   {
     name: "Builder",
-    path: "builder",
+    path: "builder/edit/:sequance",
     protected: true,
     element: (
       <ProtectedRoute>

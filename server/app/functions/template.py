@@ -3,13 +3,14 @@ from app.supabase_client import supabase
 from app.enums.response_codes import Response_codes
 
 
-async def update_customer_template(user_id, update_data):
+async def update_customer_template(user_id,templateId, update_data):
     try:
-        updated_template = supabase.table("customer_templates").update(update_data).eq("id", update_data["id"]).execute()
+        updated_template = supabase.table("customer_templates").update(update_data).eq("sequance", templateId).execute()
         if not updated_template.data:
             raise ValueError("Template not found.")
         return updated_template.data
     except Exception as e:
+        print(e)
         raise HTTPException(
             status_code=404,
             detail="Template update failed",
@@ -32,6 +33,20 @@ async def create_customer_template(user_id, data):
         raise HTTPException(
             status_code=400,
             detail="Template creation failed",
+            )
+
+async def delete_customer_template(user_id, templateId):
+    print("templateId",templateId)
+    try:
+        deleted_template = supabase.table("customer_templates").delete().eq("sequance", templateId).execute()
+        if not deleted_template.data:
+            raise ValueError("Template not found.")
+        return deleted_template.data
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=404,
+            detail="Template deletion failed",
             )
 
 async def get_customer_template(user_id,  id):

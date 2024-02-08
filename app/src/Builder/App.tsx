@@ -38,6 +38,7 @@ import Popup from "./Popup/Popup";
 import { useDispatch, useSelector } from "react-redux";
 import { popupAction } from "@/redux/popup";
 import { StoreState } from "@/redux/store";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export type FileKind = {
   "file-id": string;
@@ -50,6 +51,7 @@ export type FileData = Record<string, FileKind>;
 function App() {
   const [past, setPast] = useState<StageData[][]>([]);
   const [future, setFuture] = useState<StageData[][]>([]);
+  const templates = useSelector((state: StoreState) => state.data.templates);
   const { goToFuture, goToPast, recordPast, clearHistory } = useWorkHistory(
     past,
     future,
@@ -82,6 +84,8 @@ function App() {
   } = useHotkeyFunc();
   const { getTranslation } = useI18n();
   const [clipboard, setClipboard] = useState<StageData[]>([]);
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   const createStageDataObject = (item: Node<NodeConfig>): StageData => {
     const { id } = item.attrs;
@@ -418,11 +422,26 @@ function App() {
 
   useEffect(() => {
     // Prerender stageData
-    let dataFromLocalStorage = localStorage.getItem("template");
-    if (dataFromLocalStorage) {
-      let parsedJson = JSON.parse(dataFromLocalStorage);
-      prerenderItems(parsedJson);
+    let sequanceId = pathname.split("/").pop();
+    // If new template dont render
+    if (sequanceId === "new") return;
+
+    if (sequanceId && parseInt(sequanceId!)) {
+      let localTemplates = localStorage.getItem("templates");
+      if (!localTemplates) localTemplates = "[]";
+      let allTemplates = !templates.length
+        ? JSON.parse(localTemplates)
+        : templates;
+      let selectedTemplate = allTemplates.find(
+        (template) => template.sequance === sequanceId
+      );
+      if (!selectedTemplate)
+        return navigate("/builder/edit/new", { replace: true });
+      let template = selectedTemplate!.template;
+      prerenderItems(template);
+      return;
     }
+    navigate("/builder/edit/new", { replace: true });
   }, []);
 
   return (

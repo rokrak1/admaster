@@ -21,8 +21,11 @@ import {
 } from "@/Builder/../redux/currentStageData";
 import { motion } from "framer-motion";
 import { PreviewIcon, SaveIcon } from "@/common/icons";
-import { createTemplate } from "@/api/template";
+import { createTemplate, updateTemplate } from "@/api/template";
 import { toast } from "react-toastify";
+import { useLocation } from "react-router-dom";
+import { StoreState } from "@/redux/store";
+import { dataActions } from "@/redux/data";
 
 export type ExportKind = {
   "data-item-type": string;
@@ -65,12 +68,15 @@ export default ExportWidget;
 export const ExportThumbnail: React.FC<{
   data: ExportKind;
 }> = ({ data }) => {
-  console.log("data:", data);
   const dispatch = useDispatch();
   const { getTranslation } = useI18n();
   const { getImageAssetSrc } = useImageAsset();
   const stageData = useSelector(stageDataSelector.selectAll);
-  const dataFeed = useSelector((state) => state.dataFeed);
+  const { dataFeed, templates } = useSelector((state: StoreState) => ({
+    dataFeed: state.dataFeed,
+    templates: state.data.templates,
+  }));
+  const { pathname } = useLocation();
   const downloadSelected = (
     targetFrame?: Node<NodeConfig> | Group,
     settings?: object
@@ -340,20 +346,40 @@ export const ExportThumbnail: React.FC<{
 
   const saveTemplate = async () => {
     let name = data.templateName;
-    console.log(name);
 
     if (!name) {
       return;
     }
-    console.log("stageData:", data.stageData);
-    let [res, err] = await createTemplate(name, data.stageData);
-    if (err) {
-      toast.error("Error saving template");
-      return;
+
+    // Create new template if new
+    let sequanceId = pathname.split("/").pop();
+    if (sequanceId === "new") {
+      let [res, err] = await createTemplate(name, data.stageData);
+      if (err) {
+        toast.error("Error saving template");
+        return;
+      }
+      console.log(res);
+      dispatch(dataActions.addTemplate(res));
     }
 
-    // push template to the others
-    toast.success(" Template saved");
+    // Update template if existing
+    let selectedTemplate = templates.find(
+      (template) => template.sequance === sequanceId
+    );
+    if (selectedTemplate) {
+      let [res, err] = await updateTemplate(
+        selectedTemplate.sequance,
+        name,
+        data.stageData
+      );
+      if (err) {
+        toast.error("Error saving template");
+        return;
+      }
+      dispatch(dataActions.updateTemplate(res));
+      toast.success(" Template saved");
+    }
   };
 
   return (

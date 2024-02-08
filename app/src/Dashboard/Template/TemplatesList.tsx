@@ -10,30 +10,31 @@ import { toast } from "react-toastify";
 import { AnimatePresence, motion } from "framer-motion";
 import { modalsAction } from "@/redux/modals";
 import { Modals } from "../Modals/modals";
+import ContextMenuTemplates from "@/Builder/ContextMenu/ContextMenuTempaltes";
+import { useContextMenu } from "@/Builder/hook/useContextMenu";
 
 const TemplatesList = () => {
   const [loading, setLoading] = useState(true);
   let [showLine, setShowLine] = useState(false);
-  const { prerenderItems } = useItem();
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
   const navigate = useNavigate();
   const templates = useSelector((state: StoreState) => state.data.templates);
   const dispatch = useDispatch();
+  const { clicked, setClicked, coords, setCoords } = useContextMenu();
 
   const handleItemClick = (id: string) => {
     let selectedTemplate = templates.find((template) => template.id === id);
+    let templateSequance = selectedTemplate?.sequance;
     let template = selectedTemplate?.template;
-    prerenderItems(template);
-    navigate("../builder");
+    if (!templateSequance || !template) navigate(`../builder/edit/new`);
+
+    navigate(`../builder/edit/${templateSequance}`);
   };
 
   const showTemplateModal = () => {
     dispatch(modalsAction.setModal(Modals.TEMPLATE_PICKER));
   };
 
-  // TODO: Create routing templates/builder/edit
-  // TODO: Create routing templates/builder/edit/:id
-  // TODO: When saving a template, replace route with new id
-  // TODO: Implement cool right click (rename, delete, duplicate)
   // TODO: Add font family option on text widget
   // TODO: (not urgent) Add grouping
   // TODO: Sidebar highlight on selected route
@@ -63,9 +64,16 @@ const TemplatesList = () => {
         <h2 className="sr-only">Products</h2>
 
         {templates.length ? (
-          <div className="w-full grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-            {templates.map((template) => (
+          <div className="relative w-full grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+            {templates.map((template, i) => (
               <motion.div
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  setClicked(true);
+                  setCoords({ x: e.pageX, y: e.pageY });
+                  setSelectedTemplateId(template.sequance);
+                }}
+                key={"template" + i}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleItemClick(template.id)}
@@ -114,6 +122,13 @@ const TemplatesList = () => {
           </div>
         )}
       </div>
+      {clicked && (
+        <ContextMenuTemplates
+          top={coords.y}
+          left={coords.x}
+          selectedTemplateId={selectedTemplateId}
+        />
+      )}
     </div>
   );
 };

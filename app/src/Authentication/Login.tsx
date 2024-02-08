@@ -1,12 +1,12 @@
 import { login } from "@/api/auth";
 import { useAuth } from "@/context/auth.context";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
-  const { setUserAndRoute } = useAuth();
+  const { user, setUserAndRoute } = useAuth();
   const navigate = useNavigate();
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     setLoading(true);
@@ -30,6 +30,14 @@ const Login = () => {
     setUserAndRoute(data!, "/");
     setLoading(false);
   };
+
+  useEffect(() => {
+    if (user) {
+      console.log("naivgating user");
+      navigate("/");
+    }
+  }, [user]);
+
   return (
     <>
       {/*

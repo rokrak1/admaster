@@ -13,7 +13,7 @@ const tabs = [
   { name: "Hired", href: "#", current: false },
 ];
 
-function classNames(...classes) {
+function classNames(...classes: any) {
   return classes.filter(Boolean).join(" ");
 }
 
@@ -74,7 +74,7 @@ const TemplatesPickerModal: React.FC = () => {
         <Link
           onClick={closeModal}
           className="w-full h-full flex flex-col items-center justify-center no-underline"
-          to="../builder"
+          to="../builder/edit/new"
         >
           <PlusIcon className="text-gray-400 w-14" />
           <div className="text-gray-400 font-semibold text-sm select-none no-underline">

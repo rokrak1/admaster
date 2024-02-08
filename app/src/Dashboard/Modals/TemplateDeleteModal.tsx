@@ -3,34 +3,34 @@ import { Dialog, Transition } from "@headlessui/react";
 import { modalsAction } from "@/redux/modals";
 import { useDispatch, useSelector } from "react-redux";
 import { StoreState } from "@/redux/store";
-import { createTemplate } from "@/api/template";
-import { useNavigate } from "react-router-dom";
+import { deleteTemplate, updateTemplate } from "@/api/template";
+import { useContextMenu } from "@/Builder/hook/useContextMenu";
+import { dataActions } from "@/redux/data";
+import { toast } from "react-toastify";
 
-export default function TemplateSaveModal() {
-  const [open, setOpen] = useState(true);
+export default function TemplateDeleteModal() {
+  const [open] = useState(true);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const modalData = useSelector((state: StoreState) => state.modals.modalData);
+  const { selectedTemplate } = useSelector((state: StoreState) => ({
+    selectedTemplate: state.modals.modalData?.selectedTemplate,
+  }));
   const closeModal = () => {
-    setOpen(true);
     dispatch(modalsAction.clearModal());
   };
 
-  const handleTemplateSave = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleConfirm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    let name = (e.target as HTMLFormElement).textt.value;
-    console.log(name);
 
-    let [res, err] = await createTemplate(name, modalData);
+    let [res, err] = await deleteTemplate(selectedTemplate.sequance);
+
     if (err) {
-      console.log(err);
+      toast.error("Error renaming template");
       closeModal();
       return;
     }
-
-    // push template to the others
-    navigate("../templates");
-    console.log(res);
+    console.log("red:", res);
+    dispatch(dataActions.removeTemplate(res));
+    closeModal();
   };
 
   const cancelButtonRef = useRef(null);
@@ -79,35 +79,17 @@ export default function TemplateSaveModal() {
                       as="h2"
                       className="text-xl font-semibold leading-6 text-gray-900"
                     >
-                      Save new template
+                      Are you sure you want to delete {selectedTemplate.name}?
                     </Dialog.Title>
-                    <div className="mt-2">
-                      <p className="text-sm text-gray-500">
-                        Input name for your template
-                      </p>
-                    </div>
                   </div>
                 </div>
-                <form onSubmit={handleTemplateSave}>
-                  <div>
-                    <label htmlFor="textt" className="sr-only">
-                      Email
-                    </label>
-                    <input
-                      type="text"
-                      name="textt"
-                      id="textt"
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                      placeholder="My new template :)"
-                      maxLength={50}
-                    />
-                  </div>
+                <form onSubmit={handleConfirm}>
                   <div className=" sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
                     <button
                       type="submit"
-                      className="inline-flex mt-3 w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:col-start-2"
+                      className="duration-300 inline-flex mt-3 w-full justify-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:col-start-2"
                     >
-                      Save
+                      Delete
                     </button>
                     <button
                       type="button"
