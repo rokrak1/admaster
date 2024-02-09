@@ -13,7 +13,7 @@ export const initialStageDataList = [
           x: 200,
           y: 121.1742461324082,
           verticalAlign: "center",
-          zIndex: -1,
+          zIndex: 0,
           brightness: 0,
           "data-frame-type": "frame",
           id: "vlJ-HWh6GwLBrgjfTiOP3",

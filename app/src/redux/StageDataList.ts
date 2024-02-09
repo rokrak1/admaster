@@ -35,7 +35,6 @@ export const stageDataListSlice = createSlice({
       stageDataListEntity.setAll(state, action.payload);
     },
     addItem(state, action) {
-      console.log(action.payload);
       if (Array.isArray(action.payload)) {
         stageDataListEntity.addMany(state, action.payload);
         return;

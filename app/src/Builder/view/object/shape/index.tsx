@@ -7,6 +7,7 @@ import useTransformer from "@/Builder/hook/useTransformer";
 import { StageData } from "@/redux/currentStageData";
 import useDragAndDrop from "@/Builder/hook/useDragAndDrop";
 import useStage from "@/Builder/hook/useStage";
+import { updateTextParent } from "@/Builder/util/changeParentToGroup";
 
 export type ShapeItemKind = {
   "data-item-type": string;
@@ -45,6 +46,7 @@ const ShapeItem: React.FC<ShapeItemProps> = ({
     if (shapeRef.current) {
       stage.setStageRef(shapeRef.current.getStage()!);
       checkIsInFrame(shapeRef.current);
+      updateTextParent(shapeRef.current);
     }
   }, [data]);
 

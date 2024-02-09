@@ -278,9 +278,9 @@ const useDragAndDrop = (
     if (checkIsInFrame(e.target)) {
       return;
     }
-    if (e.target.getLayer() !== e.target.getParent()) {
+    /*  if (e.target.getLayer() !== e.target.getParent()) {
       moveToLayer(e.target as Shape<ShapeConfig>);
-    }
+    } */
   }, []);
 
   const onDragEndFrame = (e: KonvaEventObject<DragEvent>) => {

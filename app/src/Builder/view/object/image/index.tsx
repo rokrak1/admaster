@@ -7,6 +7,7 @@ import { OverrideItemProps } from "@/Builder/hook/useItem";
 import useStage from "@/Builder/hook/useStage";
 import { StageData } from "@/redux/currentStageData";
 import { decimalUpToSeven } from "@/Builder/util/decimalUpToSeven";
+import { updateTextParent } from "@/Builder/util/changeParentToGroup";
 
 export type ImageItemKind = {
   "data-item-type": string;
@@ -114,6 +115,7 @@ const ImageItem: React.FC<ImageItemProps> = ({
       stage.setStageRef(imageRef.current!.getStage()!);
       imageRef.current.brightness(data.attrs.brightness);
       checkIsInFrame(imageRef.current);
+      updateTextParent(imageRef.current);
       imageRef.current.cache();
     }
   }, [imageSrc, data]);

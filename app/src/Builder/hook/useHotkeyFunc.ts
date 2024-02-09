@@ -8,6 +8,8 @@ import useLocalStorage from "./useLocalStorage";
 import useSelection from "./useSelection";
 import useStage, { STAGE_POSITION, STAGE_SCALE } from "./useStage";
 import useTransformer from "./useTransformer";
+import Konva from "konva";
+import { updateTextParent } from "../util/changeParentToGroup";
 
 const useHotkeyFunc = () => {
   const { removeItem, createItem, updateItem } = useItem();
@@ -111,10 +113,8 @@ const useHotkeyFunc = () => {
 
   const layerUp = (selectedItems: Node<NodeConfig>[]) => {
     selectedItems.forEach((item) => {
-      const currentPosition = item.zIndex();
-      console.log("curr pos:", currentPosition, item);
+      updateTextParent(item);
       item.moveUp();
-      // item.moveToTop();
       updateItem(item.id(), (prevData) => ({
         ...item.attrs,
         zIndex: item.zIndex(),
@@ -124,12 +124,9 @@ const useHotkeyFunc = () => {
   };
 
   const layerDown = (selectedItems: Node<NodeConfig>[]) => {
-    console.log("ash:", selectedItems);
     selectedItems.forEach((item) => {
-      const currentPosition = item.zIndex();
-      // if (currentPosition === 1) return;
+      updateTextParent(item);
       item.moveDown();
-
       updateItem(item.id(), (prevData) => ({
         ...item.attrs,
         zIndex: item.zIndex(),

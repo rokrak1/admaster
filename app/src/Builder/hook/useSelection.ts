@@ -2,6 +2,8 @@ import { KonvaEventObject, Node, NodeConfig } from "konva/lib/Node";
 import { useState } from "react";
 import { ITEMS_CONTEXT } from "./useItem";
 import useTransformer from "./useTransformer";
+import Konva from "konva";
+import { updateTextParent } from "../util/changeParentToGroup";
 
 const useSelection = (transformer: ReturnType<typeof useTransformer>) => {
   const [selectedItems, setSelectedItems] = useState<
@@ -31,7 +33,7 @@ const useSelection = (transformer: ReturnType<typeof useTransformer>) => {
       setSelectedItems(itemList);
       return;
     }
-    console.log("eee:", e);
+    // console.log("eee:", e.target);
     if (!e) {
       return;
     }
@@ -40,6 +42,15 @@ const useSelection = (transformer: ReturnType<typeof useTransformer>) => {
       transformer.setTransformerConfig(transformer.transformerRef.current);
       setSelectedItems([]);
       return;
+    }
+
+    const parentUpdaterForTypes = [Konva.Text, Konva.Image, Konva.Shape];
+    const isTargetTypeValid = parentUpdaterForTypes.some(
+      (type) => e.target instanceof type
+    );
+
+    if (isTargetTypeValid) {
+      updateTextParent(e.target);
     }
 
     let newItemList = [] as ITEMS_CONTEXT["selectedItems"];

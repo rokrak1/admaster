@@ -7,6 +7,7 @@ import useTransformer from "@/Builder/hook/useTransformer";
 import { StageData } from "@/redux/currentStageData";
 import useDragAndDrop from "@/Builder/hook/useDragAndDrop";
 import useStage from "@/Builder/hook/useStage";
+import { updateTextParent } from "@/Builder/util/changeParentToGroup";
 
 export type TextItemKind = {
   "data-item-type": string;
@@ -235,6 +236,9 @@ const TextItem: React.FC<TextItemProps> = ({
     if (parentNode) {
       const parentType = parentNode.constructor.name;
       console.log("Parent type:", parentType);
+      if (parentType !== "Group") {
+        console.log("meh", parentType);
+      }
     }
     e.target.getLayer()?.batchDraw();
   }, []);
@@ -247,7 +251,12 @@ const TextItem: React.FC<TextItemProps> = ({
       const parentNode = e.target.getParent();
       if (parentNode) {
         const parentType = parentNode.constructor.name;
-        console.log("Parent type:", parentType);
+        if (parentType === "Layer") {
+          let layerChildren = e.target.getParent().children;
+          let group = layerChildren.find(
+            (child) => child.constructor.name === "Group"
+          );
+        }
       }
       updateItem(e.target.id(), () => ({
         ...e.target.attrs,
@@ -287,6 +296,15 @@ const TextItem: React.FC<TextItemProps> = ({
       };
     }
   }, []);
+
+  useEffect(() => {
+    const shapeNode = textRef.current;
+    if (!shapeNode) {
+      return;
+    }
+
+    updateTextParent(shapeNode);
+  }, [textRef, attrs]);
 
   return (
     <KonvaText

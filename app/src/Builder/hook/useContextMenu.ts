@@ -29,10 +29,6 @@ export const useContextMenu = () => {
     };
   }, []);
 
-  useEffect(() => {
-    console.log("contextmenu:", clicked, contextData);
-  }, [clicked, contextData]);
-
   return {
     clicked,
     setClicked,

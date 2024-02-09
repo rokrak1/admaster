@@ -77,7 +77,6 @@ const Popup: React.FC<PopupProps> = ({ selectedItems, onSelectItem }) => {
   const { updateItem } = useItem();
   const { autoRemoveBackground } = useRemoveImageBackground();
   const [loading, setLoading] = useState(false);
-
   const removeBackground = (
     selectedItems: ReturnType<typeof useSelection>["selectedItems"]
   ) => {

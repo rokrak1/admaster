@@ -33,7 +33,6 @@ const Login = () => {
 
   useEffect(() => {
     if (user) {
-      console.log("naivgating user");
       navigate("/");
     }
   }, [user]);

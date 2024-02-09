@@ -93,6 +93,17 @@ export const ExportThumbnail: React.FC<{
       const stage = frame.getStage()!;
       data.clearSelection();
 
+      let group = stage.children[0].children[0];
+
+      if (group.constructor.name === "Group") {
+        let children = group.children;
+        console.log("children:", children);
+        children.forEach((child) => {
+          console.log(child.constructor.name);
+          console.log(child.zIndex());
+        });
+      }
+
       const uri = stage.toDataURL({
         x: frame.getClientRect().x,
         y: frame.getClientRect().y,
@@ -100,6 +111,9 @@ export const ExportThumbnail: React.FC<{
         height: frame.attrs.height * stage.scaleY(),
         pixelRatio: 1 / stage.scaleX(),
       });
+      console.log("stejgr:", stage);
+
+      console.log("adasdwOIMAGE:");
       if (uri) {
         // Save image for preview in browser
         link.download = "export.png";
@@ -113,6 +127,7 @@ export const ExportThumbnail: React.FC<{
           image: uri,
           settings,
         };
+        console.log;
         console.log("start fetch", imagePreviewObject);
         axios
           .post(

@@ -10,6 +10,7 @@ import React, {
 import { Image as KonvaImage } from "react-konva";
 import useItem, { OverrideItemProps } from "@/Builder/hook/useItem";
 import { StageData } from "@/redux/currentStageData";
+import { updateTextParent } from "@/Builder/util/changeParentToGroup";
 
 export type IconItemKind = {
   "data-item-type": string;
@@ -76,6 +77,12 @@ const IconItem: React.FC<IconItemProps> = ({
       };
     }
   }, []);
+
+  useEffect(() => {
+    if (imageRef.current) {
+      updateTextParent(imageRef.current);
+    }
+  }, [data]);
 
   return (
     <KonvaImage
