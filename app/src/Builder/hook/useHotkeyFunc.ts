@@ -111,22 +111,28 @@ const useHotkeyFunc = () => {
 
   const layerUp = (selectedItems: Node<NodeConfig>[]) => {
     selectedItems.forEach((item) => {
+      const currentPosition = item.zIndex();
+      console.log("curr pos:", currentPosition, item);
       item.moveUp();
+      // item.moveToTop();
       updateItem(item.id(), (prevData) => ({
         ...item.attrs,
-        zIndex: 1,
+        zIndex: item.zIndex(),
         updatedAt: Date.now(),
       }));
     });
   };
 
   const layerDown = (selectedItems: Node<NodeConfig>[]) => {
+    console.log("ash:", selectedItems);
     selectedItems.forEach((item) => {
+      const currentPosition = item.zIndex();
+      // if (currentPosition === 1) return;
       item.moveDown();
 
       updateItem(item.id(), (prevData) => ({
         ...item.attrs,
-        zIndex: -1,
+        zIndex: item.zIndex(),
         updatedAt: Date.now(),
       }));
     });

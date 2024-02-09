@@ -387,8 +387,10 @@ function App() {
     initializeFileDataList(initialStageDataList);
     stage.stageRef.current.setPosition({
       x: Math.max(Math.ceil(stage.stageRef.current.width() - 1280) / 2, 0),
-      y: Math.max(Math.ceil(stage.stageRef.current.height() - 760) / 2, 0),
+      y: Math.max(Math.ceil(stage.stageRef.current.height() - 760) / 6, 0),
     });
+    // zoom out a little bit
+    stage.stageRef.current.scale({ x: 0.8, y: 0.8 });
     stage.stageRef.current.batchDraw();
   }, []);
 
@@ -443,7 +445,6 @@ function App() {
     }
     navigate("/builder/edit/new", { replace: true });
   }, []);
-
   return (
     <Layout header={header} navBar={navBar} settingBar={settingBar}>
       {hotkeyModal}

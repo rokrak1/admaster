@@ -1,8 +1,18 @@
 import { Node, NodeConfig } from "konva/lib/Node";
 import { Widgets, WidgetsEnum } from "../settingBar";
-import { AlignIcon, ColorIcon, FontIcon } from "@/common/icons";
+import {
+  AlignIcon,
+  BackgroundRemoveIcon,
+  ColorIcon,
+  FontIcon,
+  LoadingIcon,
+} from "@/common/icons";
 import { useState } from "react";
 import { popupTransformers } from "./basicTransformers";
+import useItem from "../hook/useItem";
+import useRemoveImageBackground from "../hook/useRemoveImageBackground";
+import useSelection from "../hook/useSelection";
+import { toast } from "react-toastify";
 
 enum WidgetTypes {
   text = "text",
@@ -40,16 +50,22 @@ const textPopupWidgets: iPopupIcon[] = [
     icon: AlignIcon,
   },
 ];
+const shapePopupWidgets: iPopupIcon[] = [
+  {
+    id: WidgetsEnum.colorPalette,
+    name: "Color Palette",
+    icon: ColorIcon,
+  },
+];
 
 const widgetsList = {
   [WidgetTypes.text]: textPopupWidgets,
-  [WidgetTypes.shape]: [],
+  [WidgetTypes.shape]: shapePopupWidgets,
   [WidgetTypes.image]: [],
   [WidgetTypes.icon]: [],
 };
 
 // TODO: LayerUp doesn't work
-// TODO: Add image background remover to image widget
 // TODO: Implement Save function -> DB -> return 10 generated image for now i guess
 // Builder is fine for now i guess, I'll improve it later if needed
 
@@ -58,7 +74,42 @@ function isAvailablePopupType(itemType: string): itemType is WidgetTypes {
 }
 
 const Popup: React.FC<PopupProps> = ({ selectedItems, onSelectItem }) => {
-  if (selectedItems.length !== 1) return null; // Ensure there's exactly one selected item
+  const { updateItem } = useItem();
+  const { autoRemoveBackground } = useRemoveImageBackground();
+  const [loading, setLoading] = useState(false);
+
+  const removeBackground = (
+    selectedItems: ReturnType<typeof useSelection>["selectedItems"]
+  ) => {
+    setLoading(true);
+    if (
+      selectedItems.length === 1 &&
+      selectedItems[0].attrs["data-item-type"] === "image"
+    ) {
+      const originalImage = new Image();
+      originalImage.onload = () => {
+        originalImage.width = attrs.width;
+        originalImage.height = attrs.height;
+        autoRemoveBackground(originalImage)
+          .then((base64: string) => {
+            updateItem(selectedItems[0].id(), (attrs) => ({
+              ...attrs,
+              src: base64,
+            }));
+            setLoading(false);
+          })
+          .catch((e) => {
+            toast.error("Failed to remove background");
+            setLoading(false);
+          });
+      };
+      const { attrs } = selectedItems[0];
+      const source = attrs.image.src;
+      originalImage.src = source;
+    }
+  };
+
+  if (selectedItems.length !== 1) return null;
 
   const selectedItem = selectedItems[0];
   const { x, y, width, height } = selectedItem.getClientRect();
@@ -71,6 +122,7 @@ const Popup: React.FC<PopupProps> = ({ selectedItems, onSelectItem }) => {
   const popupX = x + width / 2 - 46 - itemTypeWidgets.length * 23;
   const popupY = y - 80;
 
+  const renderBgRemover = itemType === WidgetTypes.image;
   return (
     <div
       id="popup"
@@ -101,6 +153,18 @@ const Popup: React.FC<PopupProps> = ({ selectedItems, onSelectItem }) => {
             onSelectItem={onSelectItem}
           />
         ))}
+
+        {renderBgRemover && (
+          <div
+            key={"bg-remove"}
+            onClick={() => removeBackground(selectedItems)}
+            className="flex items-center gap-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded-lg"
+          >
+            {(loading && <LoadingIcon color={"#333"} size={25} />) || (
+              <BackgroundRemoveIcon color={"#333"} size={25} />
+            )}
+          </div>
+        )}
       </div>
       {/*   {Widgets[WidgetsEnum.colorPalette]({ selectedItems: [selectedItem] })} */}
     </div>

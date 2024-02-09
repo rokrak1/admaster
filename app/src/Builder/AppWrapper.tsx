@@ -4,12 +4,13 @@ import { DataFeed, dataFeedAction } from "../redux/dataFeed";
 import Papa from "papaparse";
 import { StoreState } from "../redux/store";
 import TemplatePreview from "./TemplatePreview/TemplatePreview";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Navigation from "./Navigation/Navigation";
+import { dataActions } from "@/redux/data";
 
 const AppWrapper = () => {
   const dispatch = useDispatch();
-  const [previewOpened, setPreviewOpened] = useState(true);
+  const { showPreview } = useSelector((state: StoreState) => state.data);
   const { dataFeed, dataFeedTemplatePreviewImages } = useSelector<
     StoreState,
     DataFeed
@@ -52,6 +53,10 @@ const AppWrapper = () => {
     event.target.value = "";
   };
 
+  useEffect(() => {
+    dispatch(dataActions.initializeTemplates());
+  }, []);
+
   return (
     <div className="w-full h-full bg-[#EDF2F7]">
       {/*  <input type="file" accept=".csv" onChange={onFileChange} />
@@ -62,11 +67,8 @@ const AppWrapper = () => {
         OPEN
       </button> */}
       <App />
-      {(dataFeedTemplatePreviewImages.length && previewOpened && (
-        <TemplatePreview
-          urls={dataFeedTemplatePreviewImages}
-          setPreviewOpened={setPreviewOpened}
-        />
+      {(dataFeedTemplatePreviewImages.length && showPreview && (
+        <TemplatePreview urls={dataFeedTemplatePreviewImages} />
       )) ||
         null}
     </div>

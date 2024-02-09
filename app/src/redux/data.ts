@@ -17,10 +17,12 @@ export interface CustomerTemplate {
 
 export type DataSlice = {
   templates: CustomerTemplate[];
+  showPreview: boolean;
 };
 
 const initalDataSlice: DataSlice = {
   templates: [] as CustomerTemplate[],
+  showPreview: false,
 };
 
 export const dataSlice = createSlice({
@@ -28,6 +30,7 @@ export const dataSlice = createSlice({
   initialState: initalDataSlice,
   reducers: {
     initializeTemplates(state) {
+      if (state.templates.length > 0) return;
       let templates = localStorage.getItem("templates");
       state.templates = templates ? JSON.parse(templates) : [];
     },
@@ -57,6 +60,9 @@ export const dataSlice = createSlice({
       );
       state.templates[index] = action.payload;
       localStorage.setItem("templates", JSON.stringify(state.templates));
+    },
+    setShowPreview(state, action) {
+      state.showPreview = action.payload;
     },
   },
 });

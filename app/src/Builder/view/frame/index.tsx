@@ -124,7 +124,7 @@ const Frame: React.FC<FrameProps> = ({ data, e, onSelect, setShowPopup }) => {
         y={frameRef.current?.y() ?? initialPosition.y}
         onClick={onSelect}
       >
-        <Tag name="label-tag" pointerDirection="left" />
+        {/*   <Tag name="label-tag" pointerDirection="left" /> */}
         <Text
           text={attrs["data-frame-type"]}
           name="label-text"

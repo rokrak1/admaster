@@ -15,7 +15,6 @@ export const TextPopupWidget: React.FC<{ data: any }> = ({ data }) => {
   const { updateItem } = useItem();
 
   let selectedItem = data.selectedItems[0];
-  console.log(selectedItem);
   let text = selectedItem.attrs.text;
   let changedTextList = textList.map((item) => ({ ...item, text: text }));
 
@@ -24,7 +23,6 @@ export const TextPopupWidget: React.FC<{ data: any }> = ({ data }) => {
     const font = `${fontSize * scaleY * scaleY}px ${fontFamily}`;
     const width = measureTextWidth(text, font);
     selectedItem.attrs.fontFamily = fontFamily;
-    //selectedItem.attrs.width = width;
     selectedItem.setWidth(width);
 
     updateItem(selectedItem.id(), () => selectedItem.attrs);

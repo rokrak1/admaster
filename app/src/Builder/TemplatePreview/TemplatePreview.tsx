@@ -1,10 +1,12 @@
+import { dataActions } from "@/redux/data";
 import { motion } from "framer-motion";
 import { Dispatch } from "react";
+import { useDispatch } from "react-redux";
 
 const TemplatePreview: React.FC<{
   urls: string[];
-  setPreviewOpened: Dispatch<boolean>;
-}> = ({ urls, setPreviewOpened }) => {
+}> = ({ urls }) => {
+  const dispatch = useDispatch();
   return (
     <motion.div
       initial={{ opacity: 0, y: 500 }}
@@ -16,7 +18,7 @@ const TemplatePreview: React.FC<{
         <img src={url} alt="template preview" />
       ))}
       <button
-        onClick={() => setPreviewOpened(false)}
+        onClick={() => dispatch(dataActions.setShowPreview(false))}
         className="absolute top-5 right-5"
       >
         X Close

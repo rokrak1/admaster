@@ -5,6 +5,8 @@ import { Text as KonvaText } from "react-konva";
 import useItem, { OverrideItemProps } from "@/Builder/hook/useItem";
 import useTransformer from "@/Builder/hook/useTransformer";
 import { StageData } from "@/redux/currentStageData";
+import useDragAndDrop from "@/Builder/hook/useDragAndDrop";
+import useStage from "@/Builder/hook/useStage";
 
 export type TextItemKind = {
   "data-item-type": string;
@@ -43,6 +45,11 @@ const TextItem: React.FC<TextItemProps> = ({
 
   const textRef = useRef() as RefObject<Konva.Text>;
   const { updateItem } = useItem();
+  const stage = useStage();
+  const { onDragMoveFrame, onDragEndFrame, checkIsInFrame } = useDragAndDrop(
+    stage.stageRef,
+    stage.dragBackgroundOrigin
+  );
 
   const onEditStart = () => {
     if (textRef.current === null) {
@@ -223,17 +230,29 @@ const TextItem: React.FC<TextItemProps> = ({
     });
   };
 
-  const onDragMoveFrame = useCallback((e: KonvaEventObject<DragEvent>) => {
+  const _onDragMoveFrame = useCallback((e: KonvaEventObject<DragEvent>) => {
+    const parentNode = e.target.getParent();
+    if (parentNode) {
+      const parentType = parentNode.constructor.name;
+      console.log("Parent type:", parentType);
+    }
     e.target.getLayer()?.batchDraw();
   }, []);
 
-  const onDragEndFrame = useCallback(
+  const _onDragEndFrame = useCallback(
     (e: KonvaEventObject<DragEvent>) => {
       e.evt.preventDefault();
       e.evt.stopPropagation();
+
+      const parentNode = e.target.getParent();
+      if (parentNode) {
+        const parentType = parentNode.constructor.name;
+        console.log("Parent type:", parentType);
+      }
       updateItem(e.target.id(), () => ({
         ...e.target.attrs,
       }));
+      e.target.getParent().clipFunc(e.target.getLayer().Context);
       e.target.getLayer()?.batchDraw();
     },
     [data]
@@ -296,7 +315,7 @@ const TextItem: React.FC<TextItemProps> = ({
       rotation={attrs.rotation ?? 0}
       draggable
       onDragMove={onDragMoveFrame}
-      onDragEnd={onDragEndFrame}
+      onDragEnd={_onDragEndFrame}
     />
   );
 };

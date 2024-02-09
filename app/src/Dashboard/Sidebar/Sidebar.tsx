@@ -1,13 +1,16 @@
 import { Disclosure } from "@headlessui/react";
 import { ChevronRightIcon } from "@heroicons/react/20/solid";
 import { routes } from "@/routes/routesConfiguration";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 const Sidebar = () => {
+  const navigate = useNavigate();
+  const [openNav, setOpenNav] = useState(false);
   const { pathname } = useLocation();
   return (
     <div className="flex grow w-[250px] flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6">
@@ -26,14 +29,15 @@ const Sidebar = () => {
                 let samePath = "/" + item.path === pathname;
                 return (
                   <li key={item.name}>
-                    {!item.children ? (
+                    {!item.children ||
+                    !item?.children?.some((a) => a.showOnSidebar) ? (
                       <Link
                         to={item.path}
                         className={classNames(
                           samePath
                             ? "bg-gray-50 hover:text-cprimary-500 text-cprimary-500"
-                            : "hover:bg-gray-50 text-gray-400 hover:text-cprimary-500",
-                          "group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-gray-700 no-underline"
+                            : "hover:bg-gray-50 text-gray-700 hover:text-cprimary-500",
+                          "group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold no-underline"
                         )}
                       >
                         <item.Icon
@@ -50,33 +54,40 @@ const Sidebar = () => {
                         {item.name}
                       </Link>
                     ) : (
-                      <Disclosure as="div">
-                        {({ open }) => (
-                          <>
-                            <Disclosure.Button
+                      <div>
+                        <>
+                          <button
+                            onClick={() => {
+                              navigate(item.path);
+                            }}
+                            className={classNames(
+                              samePath
+                                ? "bg-gray-50 hover:text-cprimary-500 text-cprimary-500"
+                                : "hover:bg-gray-50 text-gray-700 hover:text-cprimary-500",
+                              "group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold w-full no-underline"
+                            )}
+                          >
+                            <item.Icon
+                              className="h-6 w-6 shrink-0 text-gray-400"
+                              aria-hidden="true"
+                            />
+                            {item.name}
+                            <ChevronRightIcon
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenNav(!openNav);
+                              }}
                               className={classNames(
-                                item.path === pathname
-                                  ? "bg-gray-50"
-                                  : "hover:bg-gray-50",
-                                "flex items-center w-full text-left rounded-md p-2 gap-x-3 text-sm leading-6 font-semibold text-gray-700"
+                                openNav
+                                  ? "rotate-90 text-gray-500"
+                                  : "text-gray-400",
+                                "ml-auto h-5 w-5 shrink-0"
                               )}
-                            >
-                              <item.Icon
-                                className="h-6 w-6 shrink-0 text-gray-400"
-                                aria-hidden="true"
-                              />
-                              {item.name}
-                              <ChevronRightIcon
-                                className={classNames(
-                                  open
-                                    ? "rotate-90 text-gray-500"
-                                    : "text-gray-400",
-                                  "ml-auto h-5 w-5 shrink-0"
-                                )}
-                                aria-hidden="true"
-                              />
-                            </Disclosure.Button>
-                            <Disclosure.Panel as="ul" className="mt-1 px-2">
+                              aria-hidden="true"
+                            />
+                          </button>
+                          {openNav && (
+                            <ul className="mt-1 px-2">
                               {item.children?.map((subItem) => (
                                 <li key={subItem.name}>
                                   {/* 44px */}
@@ -93,10 +104,10 @@ const Sidebar = () => {
                                   </Link>
                                 </li>
                               ))}
-                            </Disclosure.Panel>
-                          </>
-                        )}
-                      </Disclosure>
+                            </ul>
+                          )}
+                        </>
+                      </div>
                     )}
                   </li>
                 );

@@ -26,6 +26,7 @@ import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
 import { StoreState } from "@/redux/store";
 import { dataActions } from "@/redux/data";
+import axios from "axios";
 
 export type ExportKind = {
   "data-item-type": string;
@@ -113,20 +114,24 @@ export const ExportThumbnail: React.FC<{
           settings,
         };
         console.log("start fetch", imagePreviewObject);
-        fetch("http://localhost:8000/get-preview/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(imagePreviewObject),
-        })
-          .then((response) => response.json())
+        axios
+          .post(
+            "http://localhost:8000/api/get-preview",
+            {
+              ...imagePreviewObject,
+            },
+            {
+              withCredentials: true,
+            }
+          )
+          .then((response) => response.data)
           .then((data) => {
             let { images } = data;
             if (!images) return;
             let transfomedImages = images.map((item) => {
               return "data:image/png;base64," + item;
             });
+            dispatch(dataActions.setShowPreview(true));
             dispatch(dataFeedAction.addPreviewImage(transfomedImages));
           })
           .catch((error) => console.error("Error:", error));
@@ -367,6 +372,7 @@ export const ExportThumbnail: React.FC<{
     let selectedTemplate = templates.find(
       (template) => template.sequance === sequanceId
     );
+    console.log("selectedTemplate", selectedTemplate, sequanceId, templates);
     if (selectedTemplate) {
       let [res, err] = await updateTemplate(
         selectedTemplate.sequance,
