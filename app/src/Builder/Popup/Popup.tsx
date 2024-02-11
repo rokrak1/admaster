@@ -65,9 +65,8 @@ const widgetsList = {
   [WidgetTypes.icon]: [],
 };
 
-// TODO: LayerUp doesn't work
-// TODO: Implement Save function -> DB -> return 10 generated image for now i guess
-// Builder is fine for now i guess, I'll improve it later if needed
+// TODO: Prevent text from expanding horizontally and vertically separately
+// TODO: Block item when trying to drag outside the stage
 
 function isAvailablePopupType(itemType: string): itemType is WidgetTypes {
   return Object.values(WidgetTypes).includes(itemType as WidgetTypes);

@@ -12,6 +12,7 @@ from app.functions.auth import authenticate_user, get_user_data, set_session
 from app.models.authentication import Login
 
 
+cookie_max_age = 60 * 60 * 24 * 365
 
 
 # Register endpoint
@@ -38,8 +39,8 @@ async def login(data: Login, response: Response):
     
     
     response = ORJSONResponse(content={"user": user_data, "message": "User logged in successfully"})
-    response.set_cookie(key="refresh_token", value=session.refresh_token, httponly=True)
-    response.set_cookie(key="access_token", value=session.access_token, httponly=True)
+    response.set_cookie(key="refresh_token", value=session.refresh_token, httponly=True, max_age=cookie_max_age)
+    response.set_cookie(key="access_token", value=session.access_token, httponly=True, max_age=cookie_max_age)
 
     return response
 
@@ -67,8 +68,9 @@ async def me(request: Request, response: Response):
         raise HTTPException(status_code=404, detail="User not found")
 
     response = ORJSONResponse(content={"user": user_data, "message": "User data retrieved successfully"})
-    response.set_cookie("refresh_token", session.refresh_token, httponly=True)
-    response.set_cookie("access_token", session.access_token, httponly=True)
+
+    response.set_cookie("refresh_token", session.refresh_token, httponly=True, max_age=cookie_max_age)
+    response.set_cookie("access_token", session.access_token, httponly=True, max_age=cookie_max_age)
 
     return response
 

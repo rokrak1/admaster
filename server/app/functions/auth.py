@@ -6,7 +6,6 @@ from app.enums.response_codes import Response_codes
 async def authenticate_user(email: str, password: str):
     try:
         result = supabase.auth.sign_in_with_password({"email": email, "password": password})
-
         user = result.user
         session = result.session
         return [user, session]

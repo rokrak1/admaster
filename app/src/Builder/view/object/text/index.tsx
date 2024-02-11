@@ -63,7 +63,7 @@ const TextItem: React.FC<TextItemProps> = ({
     const textPosition = textRef.current.getAbsolutePosition();
     const stage = textRef.current.getStage();
     const container = stage!.container().getBoundingClientRect();
-    const padding = 5;
+    const padding = 0;
     const areaPosition = {
       x: container.x + textPosition.x,
       y: container.y + textPosition.y,

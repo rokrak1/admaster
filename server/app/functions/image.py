@@ -2,10 +2,19 @@ import httpx
 import copy
 import time
 import numpy as np
+import pandas as pd
 import csv
-from PIL import Image
+from PIL import Image, ImageDraw
 from pydantic import BaseModel, Field
 import cv2
+import os
+from app.utils.logger import logger
+from app.models.image_processing import CanvasData
+import base64
+
+
+
+csv_data = None
 
 async def fetch_image(url):
     headers = {
@@ -33,79 +42,236 @@ async def fetch_image(url):
 
     return None
 
-
+def read_csv_and_convert_to_dict(file_path: str, delimiter: str = ';'):
+    # Load the CSV file directly from the specified path
+    df = pd.read_csv(file_path, delimiter=delimiter)
+    
+    # Convert the DataFrame to a list of dictionaries
+    data_as_dict = df.to_dict('records')
+    
+    return data_as_dict
 
 async def draw_items_on_image(bs_image, settings, random_number):
-    base_image = copy.copy(bs_image)
+    global csv_data
+    if not csv_data:
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        os.chdir(script_dir)
+        file_path = './fbfeed.csv' 
+        csv_data = read_csv_and_convert_to_dict(file_path)
 
-    for item in settings:
-        if item['type'] == 'text':
-            x = int(item["attrs"].get('x', 0)) - 200
-            y = int(item["attrs"].get('y', 0)) - 121 + int(item["attrs"].get('textHeight', 0)) - 5
-            position = (x, y)
-            var_id = item.get('varId', '')
-            text = app_store["csv"][random_number][var_id]
-            font_scale = 1  # Adjust as needed
-            color = (0, 0, 0)  # Black color
-            thickness = 2  # Adjust as needed
-            cv2.putText(base_image, text, position, cv2.FONT_HERSHEY_SIMPLEX, font_scale, color, thickness)
-            print("Base image dimensions after processing an item:", base_image.shape)
+def hex_to_bgr(hex_color):
+    """Convert a hex color to BGR format."""
+    hex_color = hex_color.lstrip('#')  # Remove '#' if present
+    # Convert hex to BGR
+    b = int(hex_color[0:2], 16)
+    g = int(hex_color[2:4], 16)
+    r = int(hex_color[4:6], 16)
+    return (b, g, r)
 
-        elif item['type'] == 'image':
-            var_id = item.get('varId', '')
-            image_url = app_store["csv"][random_number][var_id]
-            img_data = await fetch_image(image_url)
 
-            # Check if img_data is not empty
-            if not img_data:
-                print(f"Failed to fetch image from URL: {image_url}")
-                continue  # Skip this item and continue with the next
+def create_frame(width, height, fill, opacity):
+    # Convert fill color from hex to BGR
+    bgr_color = hex_to_bgr(fill)
 
-            img_array = np.frombuffer(img_data, np.uint8)
-            if img_array.size == 0:
-                print(f"No image data found at URL: {image_url}")
-                continue  # Skip this item
+    # Create an image with the background color
+    frame = np.zeros((height, width, 3), dtype=np.uint8)
+    frame[:] = bgr_color  # Fill the frame with the background color
 
-            img = cv2.imdecode(img_array, cv2.IMREAD_UNCHANGED)
-            if img is None:
-                print(f"Failed to decode image from URL: {image_url}")
-                continue  
-            # Resize image
-            w = int(item["attrs"].get('width', 0))
-            h = int(item["attrs"].get('height', 0))
-            img = cv2.resize(img, (w, h))
+    # If opacity is less than 1, blend the frame with a black background
+    if opacity < 1:
+        # Create a black background
+        background = np.zeros((height, width, 3), dtype=np.uint8)
+        # Blend the frame with the background based on the opacity
+        frame = cv2.addWeighted(frame, opacity, background, 1-opacity, 0)
 
-            # Extract scaling factors
-            scale_x = item["attrs"].get('scaleX', 1)  # Default to 1 if scaleX is not present
-            scale_y = item["attrs"].get('scaleY', 1)  # Default to 1 if scaleY is not present
+    return frame
 
-            if scale_x:
-                scale_x = float(scale_x)
-                w = int(img.shape[1] * scale_x)
-                img = cv2.resize(img, (w, img.shape[0]))
+def order_items_by_zindex(texts, images):
+    # Merge all items into a single list
+    all_items = texts + images
+    
+    # Update: Proper check for the presence and value of zIndex
+    for item in all_items:
+        # Check if 'zIndex' is either not present or explicitly set to None
+        if getattr(item, 'zIndex', None) is None:
+            logger.warning(f"Item without zIndex found: {item}")
+            item.zIndex = 0  # Set zIndex to 0 if it's missing or None
+
+    # Now sort the items by zIndex, assuming all items have a valid zIndex at this point
+    ordered_items = sorted(all_items, key=lambda x: x.zIndex)
+    
+    return ordered_items
+
+
+def text_to_image(text, font_path, font_size, text_color=(255, 255, 255), bg_color=(0, 0, 0, 0)):
+    # Load the custom font
+    font = ImageFont.truetype(font_path, font_size)
+    
+    # Create an image with transparent background
+    image = Image.new("RGBA", font.getsize(text), bg_color)
+    draw = ImageDraw.Draw(image)
+    
+    # Draw the text
+    draw.text((0, 0), text, font=font, fill=text_color)
+    
+    return image
+
+def overlay_text_image(frame, text_img_cv2, x, y):
+    # Text image dimensions
+    img_height, img_width = text_img_cv2.shape[:2]
+
+    # Frame dimensions
+    frame_height, frame_width = frame.shape[:2]
+
+    # Calculate the overlay region, taking clipping into account
+    start_x, start_y = max(x, 0), max(y, 0)
+    end_x, end_y = min(x + img_width, frame_width), min(y + img_height, frame_height)
+
+    # Calculate the region of interest in the text image considering the frame boundaries
+    text_img_roi = text_img_cv2[max(0, -y):end_y-y, max(0, -x):end_x-x]
+
+    if start_x < end_x and start_y < end_y:  # Check if there's an overlap
+        frame[start_y:end_y, start_x:end_x] = text_img_roi
+
+    return frame
+
+def pil_to_cv2(pil_image):
+    # Convert a PIL Image to an OpenCV image
+    open_cv_image = np.array(pil_image)
+    # Convert RGB to BGR
+    return open_cv_image[:, :, ::-1].copy()
+
+def overlay_with_transparency(frame, overlay, position):
+    x, y = position
+    overlay_height, overlay_width = overlay.shape[:2]
+
+    # Background and foreground extraction for overlay
+    bg = frame[y:y+overlay_height, x:x+overlay_width]
+    alpha_mask = overlay[:, :, 3] / 255.0
+    overlay = cv2.cvtColor(overlay[:, :, :3], cv2.COLOR_RGBA2BGR)
+
+    # Ensure alpha mask dimensions match
+    alpha_mask = alpha_mask[:,:,np.newaxis]
+
+    # Combine background and foreground based on alpha mask
+    combined = bg * (1 - alpha_mask) + overlay * alpha_mask
+    frame[y:y+overlay_height, x:x+overlay_width] = combined.astype(np.uint8)
+
+def draw_text_intelligently(frame, text, position, font, font_scale, color, thickness, font_path=None):
+    x, y = position
+    frame_height, frame_width = frame.shape[:2]
+
+    # Convert color from hex to BGR
+    color_bgr = hex_to_bgr(color)
+
+    # Estimate text size with OpenCV
+    (text_width, text_height), baseline = cv2.getTextSize(text, font, font_scale, thickness)
+    text_bottom_right_x = x + text_width
+    text_bottom_right_y = y + text_height
+
+    # Check if text fits within frame boundaries
+    if 0 <= x <= frame_width and 0 <= y <= frame_height and text_bottom_right_x <= frame_width and text_bottom_right_y <= frame_height:
+        # Text fits within frame, use OpenCV's putText
+        print(text, x, y, font, font_scale, color_bgr, thickness)
+        cv2.putText(frame, text, (int(x), int(y + text_height)), font, 1, color_bgr, thickness)
+    else:
+        # Text exceeds frame or custom font needed, check for font_path
+        if not font_path:
+            # Define a default font if no custom font path is provided
+            # This is a fallback scenario; you might need to ensure you have a reasonable default font
+            current_dir = os.path.dirname(__file__)  # Get the directory where the script is located
+            font_path = os.path.join(current_dir, '..', 'utils', 'fonts', 'roboto_regular.ttf')
+
             
-            if scale_y:
-                scale_y = float(scale_y)
-                h = int(img.shape[0] * scale_y)
-                img = cv2.resize(img, (img.shape[1], h))
+        # Use PIL to render text as an image for more complex handling
+        pil_text_image = text_to_image(text, font_path, int(font_scale * 20), color, (0, 0, 0, 0))  # Adjust scale as needed
+        cv_text_image = pil_to_cv2(pil_text_image)
+        overlay_with_transparency(frame, cv_text_image, (max(x, 0), max(y, 0)))
 
-            if scale_x or scale_y:
-                # Resize the image
-                img = cv2.resize(img, (w, h))
-            
-            if img.shape[2] == 3:
-                img = cv2.cvtColor(img, cv2.COLOR_RGB2RGBA)
+    return frame
 
-            top_border = 2    # The number of pixels for the top border
-            bottom_border = 2 # The number of pixels for the bottom border
-            left_border = 2   # The number of pixels for the left border
-            right_border = 2  # The number of pixels for the right border
-            border_color = (255, 0, 0) 
-            img_with_border = cv2.copyMakeBorder(img, top_border, bottom_border, left_border, right_border, cv2.BORDER_CONSTANT, value=border_color)
 
-            # Ensure that the coordinates and dimensions fit within the base_image
-            x = int(item["attrs"].get('x', 0)) - 200
-            y = int(item["attrs"].get('y', 0)) - 121
-            base_image[y:y+h, x:x+w] = img
+# Decode base64 to image
+def decode_base64_to_image(base64_string):
+    # Remove any leading and trailing whitespaces from the base64 string
+    base64_string = base64_string.strip()
 
-    return base_image
+    # Add padding to the base64 string if needed
+    padded_base64_string = base64_string + '=' * (-len(base64_string) % 4)
+
+    # Decode the base64 string and convert it to a NumPy array
+    img_data = base64.b64decode(padded_base64_string)
+    np_arr = np.frombuffer(img_data, np.uint8)
+
+    # Decode the image using OpenCV
+    return cv2.imdecode(np_arr, cv2.IMREAD_UNCHANGED)
+
+def draw_image_with_clipping(frame, img, x, y):
+    # Frame dimensions
+    frame_height, frame_width = frame.shape[:2]
+    
+    # Image dimensions
+    img_height, img_width = img.shape[:2]
+
+    # Calculate clipping boundaries
+    start_x = max(x, 0)
+    start_y = max(y, 0)
+    end_x = min(frame_width, x + img_width)
+    end_y = min(frame_height, y + img_height)
+
+    # Calculate the region of interest on the frame and the image
+    frame_roi = (slice(start_y, end_y), slice(start_x, end_x))
+    img_roi = (slice(0, end_y - y, 1), slice(0, end_x - x, 1))
+
+    # Apply clipping to the image if necessary
+    if start_x < frame_width and start_y < frame_height:  # Check if the ROI is within the frame
+        frame[frame_roi] = img[img_roi]
+
+    return frame
+
+
+
+def draw_image(frame, item):
+    # Decode the base64 image string to an OpenCV image
+    print("before decode_base64_to_image")
+    img = decode_base64_to_image(item.image)
+    print("after decode_base64_to_image")
+    draw_image_with_clipping(frame, img, item.x, item.y)
+
+def draw_text(frame, item):
+    draw_text_intelligently(frame, item.text, (item.x, item.y), cv2.FONT_HERSHEY_SIMPLEX, 1, item.fill, 1, None)
+
+
+def draw_items_on_frame(frame, items):
+    for item in items:
+        if item.type == 'text':
+            draw_text(frame, item)
+        elif item.type == 'image':
+            draw_image(frame, item)
+        else:
+            print(f"No draw function for type: {item.type}")
+
+    return frame
+
+def generate_image_from_canvas_data(canvas_data: CanvasData) -> str:
+    # Here, you would use the functions you've defined to create an image based on the canvas data
+    
+    # Create the initial frame based on canvas size and background settings
+    frame = create_frame(
+        width=int(canvas_data.frame.width),  # Adjusted from canvas_data.width
+        height=int(canvas_data.frame.height),  # Adjusted from canvas_data.height
+        fill=canvas_data.frame.fill,  # Adjusted from canvas_data.fill
+        opacity=canvas_data.frame.opacity  # Adjusted from canvas_data.opacity
+    )
+    print("Frame done...")
+
+    # Sort and draw all items on the frame
+    items = order_items_by_zindex(canvas_data.text, canvas_data.image)
+    print("Items ordered...")
+    frame = draw_items_on_frame(frame, items)
+    print("Items drawn...")
+    # Convert the frame to a base64 string to return
+    _, buffer = cv2.imencode('.jpg', frame)
+    image_base64 = base64.b64encode(buffer).decode('utf-8')
+
+    return image_base64

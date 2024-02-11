@@ -390,7 +390,7 @@ function App() {
       y: Math.max(Math.ceil(stage.stageRef.current.height() - 760) / 6, 0),
     });
     // zoom out a little bit
-    stage.stageRef.current.scale({ x: 0.8, y: 0.8 });
+    stage.stageRef.current.scale({ x: 0.7, y: 0.7 });
     stage.stageRef.current.batchDraw();
   }, []);
 
@@ -464,7 +464,6 @@ function App() {
           anchorFill="white"
           anchorSize={14}
           anchorCornerRadius={15}
-          padding={5}
         />
       </View>
       {showPopup && (

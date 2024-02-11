@@ -27,6 +27,8 @@ import { useLocation } from "react-router-dom";
 import { StoreState } from "@/redux/store";
 import { dataActions } from "@/redux/data";
 import axios from "axios";
+import Konva from "konva";
+import api from "@/api";
 
 export type ExportKind = {
   "data-item-type": string;
@@ -66,297 +68,171 @@ const ExportWidget: React.FC<ExportWidgetProps> = ({ data }) => (
 
 export default ExportWidget;
 
+function convertImageToBase64(imageElement: HTMLImageElement) {
+  return new Promise((resolve, reject) => {
+    // Create a canvas and use it to convert the image to Base64
+    const canvas = document.createElement("canvas");
+    canvas.width = imageElement.width;
+    canvas.height = imageElement.height;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(imageElement, 0, 0);
+    const dataURL = canvas.toDataURL("image/png");
+
+    resolve(dataURL);
+  });
+}
+
 export const ExportThumbnail: React.FC<{
   data: ExportKind;
 }> = ({ data }) => {
   const dispatch = useDispatch();
   const { getTranslation } = useI18n();
   const { getImageAssetSrc } = useImageAsset();
+  const { pathname } = useLocation();
   const stageData = useSelector(stageDataSelector.selectAll);
   const { dataFeed, templates } = useSelector((state: StoreState) => ({
     dataFeed: state.dataFeed,
     templates: state.data.templates,
   }));
-  const { pathname } = useLocation();
-  const downloadSelected = (
-    targetFrame?: Node<NodeConfig> | Group,
-    settings?: object
-  ) => {
-    const link = document.createElement("a");
-    const frame =
-      targetFrame ??
-      data.selectedItems.find(
-        (item) => item.attrs["data-item-type"] === "frame"
-      );
+
+  const downloadSelected = async (children: Node<NodeConfig>[]) => {
+    const frame = children?.find(
+      (child) => child.attrs["data-item-type"] === "frame"
+    );
     if (frame) {
-      //console.log(frame, data);
-      const stage = frame.getStage()!;
       data.clearSelection();
 
-      let group = stage.children[0].children[0];
+      let { x: xFrame, y: yFrame } = frame.attrs;
 
-      if (group.constructor.name === "Group") {
-        let children = group.children;
-        console.log("children:", children);
-        children.forEach((child) => {
-          console.log(child.constructor.name);
-          console.log(child.zIndex());
-        });
+      let dataItemType = ["shape", "image", "text"];
+
+      console.log("KONVA:::", children);
+      let filteredChildren = {
+        text: [],
+        image: [],
+      };
+
+      for (let child of children) {
+        let type = child.attrs["data-item-type"];
+        if (dataItemType.includes(type)) {
+          let {
+            x,
+            y,
+            width,
+            height,
+            scaleX,
+            scaleY,
+            rotation,
+            fill,
+            stroke,
+            strokeWidth,
+            opacity,
+          } = child.attrs;
+          let zIndex = child.getZIndex();
+          let itemData = {
+            x: x - xFrame,
+            y: y - yFrame,
+            width,
+            height,
+            scaleX: scaleX || 1,
+            scaleY: scaleY || 1,
+            rotation: rotation || 0,
+            fill,
+            stroke: stroke || null,
+            strokeWidth: strokeWidth || 0,
+            opacity,
+            zIndex,
+            type,
+            varId: null,
+          };
+          if (type === "text") {
+            itemData["text"] = child.text();
+            itemData["fontSize"] = child.fontSize();
+            itemData["color"] = child.colorKey;
+            itemData["fontFamily"] = child.fontFamily();
+            filteredChildren["text"].push(itemData);
+          } else if (type === "image") {
+            let isVar = stageData.find((d) => d.id === child.id())?.varId;
+            if (isVar) {
+              itemData["varId"] = isVar;
+            }
+            itemData["image"] = await convertImageToBase64(child!.image());
+            filteredChildren["image"].push(itemData);
+          } else if (type === "shape") {
+            let shapeImage = child.toDataURL();
+            itemData["image"] = shapeImage;
+            filteredChildren["image"].push(itemData);
+          }
+        }
       }
 
-      const uri = stage.toDataURL({
+      const requestData = {
+        frame: {
+          ...frame.attrs,
+          x: 0,
+          y: 0,
+        },
+        ...filteredChildren,
+      };
+      console.log("REQUEST DATA", requestData);
+      /*       const uri = stage.toDataURL({
         x: frame.getClientRect().x,
         y: frame.getClientRect().y,
         width: frame.attrs.width * stage.scaleX(),
         height: frame.attrs.height * stage.scaleY(),
         pixelRatio: 1 / stage.scaleX(),
-      });
-      console.log("stejgr:", stage);
 
-      console.log("adasdwOIMAGE:");
-      if (uri) {
-        // Save image for preview in browser
+         // Save image for preview in browser
         link.download = "export.png";
         link.href = uri;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-
-        // Generate form data for request
-        let imagePreviewObject = {
-          image: uri,
-          settings,
-        };
-        console.log;
-        console.log("start fetch", imagePreviewObject);
-        axios
-          .post(
-            "http://localhost:8000/api/get-preview",
-            {
-              ...imagePreviewObject,
-            },
-            {
-              withCredentials: true,
-            }
-          )
-          .then((response) => response.data)
-          .then((data) => {
-            let { images } = data;
-            if (!images) return;
-            let transfomedImages = images.map((item) => {
-              return "data:image/png;base64," + item;
-            });
-            dispatch(dataActions.setShowPreview(true));
-            dispatch(dataFeedAction.addPreviewImage(transfomedImages));
-          })
-          .catch((error) => console.error("Error:", error));
-      }
-    }
-  };
-
-  const filterOutVars = (layer) => {
-    // Filter out text vars
-    let layerChildren = layer.getChildren();
-
-    // Check if there are any text vars inside group
-    const vars = layerChildren.filter(
-      (item) =>
-        item.attrs["data-item-type"] === "text" &&
-        item.attrs.text?.includes("%VAR_")
-    );
-
-    let varsSettings = [];
-    // Get image var settings
-    if (vars.length !== 0) {
-      varsSettings = vars.map((item) => {
-        const text = item.attrs.text;
-        const textSplit = text.split("%VAR_");
-        const varId = textSplit[1].split("%")[0];
-        return {
-          type: "text",
-          varId: varId?.toLowerCase(),
-          attrs: {
-            ...item.attrs,
-            color: item.colorKey,
-            textHeight: item.textHeight,
-            textWidth: item.textWidth,
+      }); */
+      api
+        .post(
+          "http://localhost:8000/api/get-preview",
+          {
+            ...requestData,
           },
-        };
-      });
-    }
-
-    // Filter out vars so they do not get displayed in exported image
-    layer.children = layerChildren.filter(
-      (item) => !item.attrs.text?.includes("%VAR_")
-    );
-
-    // IMAGE - Filter out image vars inside group object
-    const group = layer.getChildren(
-      (item) => item.attrs.name === "label-group"
-    );
-
-    // Check if there are any image vars inside group
-    const varsImages = group[0].children
-      .map((item) => {
-        console.log("item:", item);
-        if (item.attrs["data-item-type"] === "image") {
-          let id = item.attrs.id;
-          let found = stageData.find((item) => item.id === id);
-          console.log("found:", found);
-          if (!found) return null;
-          if (found.varId)
-            return {
-              ...item,
-              varId: found.varId,
-            };
-        }
-        return null;
-      })
-      .filter((item) => item !== null);
-    let varsImageSettings = [];
-    // Get image var settings
-    if (varsImages.length !== 0) {
-      varsImageSettings = varsImages.map((item) => {
-        return {
-          type: "image",
-          varId: item.varId,
-          attrs: item.attrs,
-        };
-      });
-
-      // Filter out vars so they do not get displayed in exported image
-      let groupId = group[0]._id;
-      const groupChildIndex = layer.children
-        .map((item, index) => {
-          if (item._id === groupId) {
-            return index;
+          {
+            withCredentials: true,
           }
-          return null;
+        )
+        .then((response) => response.data)
+        .then((data) => {
+          console.log("RETURNED data", data);
+          let { image } = data;
+          if (!image) return;
+          let images = "data:image/png;base64," + image;
+          console.log(images);
+          //dispatch(dataActions.setShowPreview(true));
+          //dispatch(dataFeedAction.addPreviewImage(images));
         })
-        .filter((item) => item !== null)[0];
+        .catch((error) => console.error("Error:", error));
 
-      layer.children[groupChildIndex].children = layer.children[
-        groupChildIndex
-      ].children.filter(
-        (item) => !varsImages.find((i) => i.attrs.id === item.attrs.id)
-      );
+      return;
     }
-
-    return { layer, varsSettings: varsSettings.concat(varsImageSettings) };
+    toast.error("Error creating preview");
   };
 
   const downloadAll = () => {
-    // TODO: Image support with removed background
-    // TODO: Remove export selected frame option
-    // TODO: This code needs to be refactored to support only 1 frame
-
-    // Something wrong with facebook ad frame
-
     // Create copy of layer where vars are removed and settings are stored into varsSettings
     const initLayer = data.stageRef.current.getChildren()[0];
-    console.log("stagedata:", stageData);
-    const clonedLayer = cloneDeep(initLayer);
-    console.log("LAZER:", clonedLayer);
-    const { layer, varsSettings } = filterOutVars(clonedLayer);
-    console.log("varSettings:", varsSettings);
-    const frames = layer.getChildren(
-      (item) => item.attrs.name === "label-group"
-    );
 
-    // Generate original template for creative generation
-    frames
-      .map(
-        (frame) =>
-          (frame as Group).getChildren(
-            (item) => item.attrs.name === "label-target"
-          )[0]
-      )
-      .forEach((frame) => {
-        downloadSelected(frame as Node<NodeConfig>, varsSettings);
-      });
+    let initGroup =
+      initLayer.getChildren((child) => child instanceof Konva.Group)[0] || null;
 
-    // Generate some previews of different products from CSV if provided
-    // Used initial layer - vars replaced with csv data
+    if (!initGroup) {
+      toast.error("Error creating preview");
+      return;
+    }
+
+    const group = cloneDeep(initGroup);
+
+    downloadSelected(group.children as Group);
+
     return;
-    dataFeed.data?.slice(0, 3).forEach((item, i) => {
-      // If this is first iteration, we cleanup old preview images
-      if (i === 0) {
-        dispatch(dataFeedAction.clearPreviewImages());
-      }
-
-      const clonedLayer = cloneDeep(initLayer);
-      replaceVarsWithDataFeed(clonedLayer, item);
-
-      console.log("CONED:", clonedLayer);
-      const frames = clonedLayer.getChildren(
-        (item) => item.attrs.name === "label-group"
-      );
-
-      console.log("FRAMES:", frames);
-
-      frames
-        .map(
-          (frame) =>
-            (frame as Group).getChildren(
-              (item) => item.attrs.name === "label-target"
-            )[0]
-        )
-        .forEach((frame) => {
-          // For now we will just loop through 3 rows of csv
-          downloadSelected(frame as Node<NodeConfig>, true);
-        });
-    });
-  };
-
-  const replaceVarsWithDataFeed = (layer, dataFeedItem) => {
-    let layerChildren = layer.getChildren();
-    const itemsAndReplacedVars = layerChildren.map((item) => {
-      if (
-        item.attrs["data-item-type"] === "text" &&
-        item.attrs.text?.includes("%VAR_")
-      ) {
-        const text = item.attrs.text;
-        const textSplit = text.split("%VAR_");
-        const varName = textSplit[1].split("%")[0];
-        item.setText(dataFeedItem[varName?.toLowerCase()]);
-        //item._partialText = dataFeedItem[varName?.toLowerCase()];
-        return item;
-      } else if (item.attrs["name"] === "label-group") {
-        let childs = item.getChildren();
-        childs.forEach(async (child) => {
-          if (child.attrs["data-item-type"] === "image") {
-            let id = child.attrs.id;
-            let found = stageData.find((item) => item.id === id);
-            if (!found) return;
-            if (found.varId) {
-              let src = dataFeedItem.image_link;
-
-              console.log(src); // myBase64 is the base64 string
-              await toDataUrl(src, function (myBase64) {
-                child.setImage(myBase64);
-              });
-            }
-          }
-        });
-      }
-      return item;
-    });
-
-    layer.children = itemsAndReplacedVars;
-  };
-
-  const toDataUrl = async (url, callback) => {
-    var xhr = new XMLHttpRequest();
-    xhr.onload = function () {
-      var reader = new FileReader();
-      reader.onloadend = function () {
-        callback(reader.result);
-      };
-      reader.readAsDataURL(xhr.response);
-    };
-    xhr.open("GET", url);
-    xhr.responseType = "blob";
-    xhr.send();
   };
 
   const onClickDownload = () => {

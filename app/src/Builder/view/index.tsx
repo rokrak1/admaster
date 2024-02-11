@@ -114,7 +114,7 @@ const View: React.FC<ViewProps> = ({
     if (!stage) {
       return;
     }
-    stage.scale({ x: 1, y: 1 });
+    stage.scale({ x: 0.8, y: 0.8 });
     stage.position({ x: 0, y: 0 });
     setValue(STAGE_POSITION, { x: 0, y: 0 });
     setValue(STAGE_SCALE, { x: 1, y: 1 });
