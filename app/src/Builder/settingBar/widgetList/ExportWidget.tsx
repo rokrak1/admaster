@@ -145,6 +145,8 @@ export const ExportThumbnail: React.FC<{
             type,
             varId: null,
           };
+          let stage = data.stageRef.current;
+
           if (type === "text") {
             itemData["text"] = child.text();
             itemData["fontSize"] = child.fontSize();
@@ -156,10 +158,18 @@ export const ExportThumbnail: React.FC<{
             if (isVar) {
               itemData["varId"] = isVar;
             }
-            itemData["image"] = await convertImageToBase64(child!.image());
+            itemData["image"] = await child.toDataURL({
+              pixelRatio: 1 / stage.scaleX(),
+              width: width * scaleX,
+              height: height * scaleY,
+            });
             filteredChildren["image"].push(itemData);
           } else if (type === "shape") {
-            let shapeImage = child.toDataURL();
+            let shapeImage = child.toDataURL({
+              pixelRatio: 1 / stage.scaleX(),
+              width: width * scaleX,
+              height: height * scaleY,
+            });
             itemData["image"] = shapeImage;
             filteredChildren["image"].push(itemData);
           }

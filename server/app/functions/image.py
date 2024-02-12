@@ -11,6 +11,7 @@ import os
 from app.utils.logger import logger
 from app.models.image_processing import CanvasData
 import base64
+import re
 
 
 
@@ -192,40 +193,95 @@ def draw_text_intelligently(frame, text, position, font, font_scale, color, thic
 
 
 # Decode base64 to image
-def decode_base64_to_image(base64_string):
-    # Remove any leading and trailing whitespaces from the base64 string
-    base64_string = base64_string.strip()
+def decode_base64_to_image(data_url):
+    # Find and remove the MIME type and encoding header (e.g., "data:image/png;base64,")
+    header, base64_data = re.split(',', data_url, maxsplit=1)
+    
+    # Decode the base64 string
+    img_data = base64.b64decode(base64_data)
+    
+    # Convert the bytes data to a NumPy array
+    np_arr = np.frombuffer(img_data, dtype=np.uint8)
+    
+    # Decode the NumPy array into an image
+    img = cv2.imdecode(np_arr, cv2.IMREAD_UNCHANGED)
+    
+    return img
 
-    # Add padding to the base64 string if needed
-    padded_base64_string = base64_string + '=' * (-len(base64_string) % 4)
+def has_alpha_channel(img):
+    # Check if the image has three dimensions (H, W, C) and the number of channels (C) is 4
+    return img.ndim == 3 and img.shape[2] == 4
 
-    # Decode the base64 string and convert it to a NumPy array
-    img_data = base64.b64decode(padded_base64_string)
-    np_arr = np.frombuffer(img_data, np.uint8)
 
-    # Decode the image using OpenCV
-    return cv2.imdecode(np_arr, cv2.IMREAD_UNCHANGED)
+def blend_images_with_alpha(frame, overlay_img, start_x, start_y, end_x, end_y):
+    """
+    Blend an overlay image with an alpha channel onto a background frame.
 
-def draw_image_with_clipping(frame, img, x, y):
+    Args:
+    - frame: Background image as a NumPy array.
+    - overlay_img: Overlay image as a NumPy array (must have an alpha channel).
+    - start_x, start_y: Top-left coordinates on the frame where the overlay begins.
+    - end_x, end_y: Bottom-right coordinates on the frame where the overlay ends.
+    """
+    # Calculate the size of the overlay
+    overlay_height = end_y - start_y
+    overlay_width = end_x - start_x
+
+    # Resize overlay to fit the designated area if necessary
+    if (overlay_width, overlay_height) != overlay_img.shape[1::-1]:
+        overlay_img = cv2.resize(overlay_img, (overlay_width, overlay_height), interpolation=cv2.INTER_AREA)
+
+    # Extract the alpha mask and color channels of the overlay image
+    alpha_mask = overlay_img[:, :, 3] / 255.0
+    overlay_color = overlay_img[:, :, :3]
+
+    # Extract the region of interest (ROI) from the background frame
+    frame_roi = frame[start_y:end_y, start_x:end_x]
+
+    # Perform the blending by combining the ROI with the overlay image based on the alpha mask
+    blended_roi = (1.0 - alpha_mask[..., np.newaxis]) * frame_roi + alpha_mask[..., np.newaxis] * overlay_color
+
+    # Place the blended ROI back into the original frame
+    frame[start_y:end_y, start_x:end_x] = blended_roi.astype(np.uint8)
+
+
+def draw_image_with_clipping(frame, img, image_settings):
     # Frame dimensions
     frame_height, frame_width = frame.shape[:2]
     
-    # Image dimensions
+    # Extract image settings
+    x, y = int(round(image_settings.x)), int(round(image_settings.y))
     img_height, img_width = img.shape[:2]
-
-    # Calculate clipping boundaries
+    
+    # Calculate the overlay image's end positions based on its dimensions
+    overlay_end_x = x + img_width
+    overlay_end_y = y + img_height
+    
+    # Calculate actual start and end positions for overlay on the frame
     start_x = max(x, 0)
     start_y = max(y, 0)
-    end_x = min(frame_width, x + img_width)
-    end_y = min(frame_height, y + img_height)
+    end_x = min(overlay_end_x, frame_width)
+    end_y = min(overlay_end_y, frame_height)
+    
+    # Calculate the region of the overlay image to use
+    overlay_start_x = max(-x, 0)
+    overlay_start_y = max(-y, 0)
+    overlay_end_x = img_width - max(overlay_end_x - frame_width, 0)
+    overlay_end_y = img_height - max(overlay_end_y - frame_height, 0)
+    
+    # Ensure there's something to draw
+    if start_x >= end_x or start_y >= end_y or overlay_start_x >= overlay_end_x or overlay_start_y >= overlay_end_y:
+        return frame  # Nothing to draw, as the image is completely outside the frame
 
-    # Calculate the region of interest on the frame and the image
-    frame_roi = (slice(start_y, end_y), slice(start_x, end_x))
-    img_roi = (slice(0, end_y - y, 1), slice(0, end_x - x, 1))
-
-    # Apply clipping to the image if necessary
-    if start_x < frame_width and start_y < frame_height:  # Check if the ROI is within the frame
-        frame[frame_roi] = img[img_roi]
+    # Extract the relevant part of the overlay image
+    img_roi = img[overlay_start_y:overlay_end_y, overlay_start_x:overlay_end_x]
+    
+    # Blending or direct overlay based on alpha
+    if has_alpha_channel(img):
+        blend_images_with_alpha(frame, img_roi, start_x, start_y, end_x, end_y)
+    else:
+        # Directly overlay the extracted ROI onto the frame
+        frame[start_y:end_y, start_x:end_x] = img_roi
 
     return frame
 
@@ -233,10 +289,8 @@ def draw_image_with_clipping(frame, img, x, y):
 
 def draw_image(frame, item):
     # Decode the base64 image string to an OpenCV image
-    print("before decode_base64_to_image")
     img = decode_base64_to_image(item.image)
-    print("after decode_base64_to_image")
-    draw_image_with_clipping(frame, img, item.x, item.y)
+    draw_image_with_clipping(frame, img, item)
 
 def draw_text(frame, item):
     draw_text_intelligently(frame, item.text, (item.x, item.y), cv2.FONT_HERSHEY_SIMPLEX, 1, item.fill, 1, None)
