@@ -5,7 +5,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "serif",
+    "fontFamily": "A25-SQUANOVA",
     "text": "Seize the day with kindness."
   },
   {
@@ -14,7 +14,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'Fira Mono', monospace",
+    "fontFamily": "Abeganshi",
     "text": "Embrace the unknown."
   },
   {
@@ -23,7 +23,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'Hurricane', cursive",
+    "fontFamily": "Aero",
     "text": "Craft your dreams."
   },
   {
@@ -32,7 +32,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'League Gothic', sans-serif",
+    "fontFamily": "Agency_0",
     "text": "Venture beyond."
   },
   {
@@ -41,7 +41,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'Roboto Slab', serif",
+    "fontFamily": "'Aquire'",
     "text": "Inspire innovation."
   },
   {
@@ -50,7 +50,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'Nanum Gothic', sans-serif",
+    "fontFamily": "'Azonix'",
     "text": "Dream big. Work hard."
   },
   {
@@ -59,7 +59,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'Do Hyeon', sans-serif",
+    "fontFamily": "'BEBAS___'",
     "text": "Stay positive and happy."
   },
   {
@@ -68,7 +68,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'Gamja Flower', cursive",
+    "fontFamily": "'True Lies'",
     "text": "Be the change you wish to see."
   },
   {
@@ -77,7 +77,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'Jua', sans-serif",
+    "fontFamily": "'the breakdown'",
     "text": "Keep pushing forward."
   },
   {
@@ -86,7 +86,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'Noto Sans KR', sans-serif",
+    "fontFamily": "'Subspace'",
     "text": "Embrace the journey."
   },
   {
@@ -95,7 +95,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'Noto Serif KR', serif",
+    "fontFamily": "'Road_Rage'",
     "text": "Live, laugh, love."
   },
   {
@@ -104,7 +104,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'Ma Shan Zheng', cursive",
+    "fontFamily": "'Peace Sans'",
     "text": "Explore, dream, discover."
   },
   {
@@ -113,7 +113,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'Noto Serif SC', serif",
+    "fontFamily": "'Nexa Bold'",
     "text": "Never stop learning."
   },
   {
@@ -122,7 +122,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'ZCOOL KuaiLe', cursive",
+    "fontFamily": "'Montserrat-Bold'",
     "text": "Create your own sunshine."
   },
   {
@@ -131,7 +131,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'M PLUS 1', sans-serif",
+    "fontFamily": "'MCF_Krechet'",
     "text": "Happiness is a journey."
   },
   {
@@ -140,7 +140,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'Noto Sans JP', sans-serif",
+    "fontFamily": "'JUSTICE LEAGUE'",
     "text": "Believe in yourself."
   },
   {
@@ -149,7 +149,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'Noto Serif JP', serif",
+    "fontFamily": "'HeadlinerNo'",
     "text": "Chase your dreams."
   },
   {
@@ -158,7 +158,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'Rampart One', cursive",
+    "fontFamily": "'Gobold Extra1'",
     "text": "Every moment matters."
   },
   {
@@ -167,7 +167,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'Yuji Hentaigana Akebono', cursive",
+    "fontFamily": "'GoshaSans-Regular'",
     "text": "Find joy in the ordinary."
   },
   {
@@ -176,7 +176,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'Zen Kurenaido', sans-serif",
+    "fontFamily": "'Evogria'",
     "text": "Gratitude changes everything."
   },
   {
@@ -185,7 +185,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'Anton', sans-serif",
+    "fontFamily": "'Dry Brush'",
     "text": "Focus on the good."
   },
   {
@@ -194,7 +194,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'Dancing Script', cursive",
+    "fontFamily": "'Demonized'",
     "text": "Spread love everywhere you go."
   },
   {
@@ -203,7 +203,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'Inconsolata', monospace",
+    "fontFamily": "'Damages'",
     "text": "Be brave, be kind."
   },
   {
@@ -212,7 +212,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'Open Sans', sans-serif",
+    "fontFamily": "'Carnevalee Freakshow'",
     "text": "A smile is a universal welcome."
   },
   {
@@ -221,7 +221,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'Playfair Display', serif",
+    "fontFamily": "'Burbank Big Condensed Bold'",
     "text": "Make today amazing."
   },
   {
@@ -230,7 +230,7 @@
     "width": 250,
     "height": 35,
     "fontSize": 30,
-    "fontFamily": "'Roboto Mono', monospace",
+    "fontFamily": "'blowbrush'",
     "text": "Every day is a new beginning."
   }
 ]

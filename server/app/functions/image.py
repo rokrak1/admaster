@@ -4,7 +4,7 @@ import time
 import numpy as np
 import pandas as pd
 import csv
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 from pydantic import BaseModel, Field
 import cv2
 import os
@@ -12,8 +12,7 @@ from app.utils.logger import logger
 from app.models.image_processing import CanvasData
 import base64
 import re
-
-
+import freetype
 
 csv_data = None
 
@@ -62,12 +61,15 @@ async def draw_items_on_image(bs_image, settings, random_number):
 
 def hex_to_bgr(hex_color):
     """Convert a hex color to BGR format."""
+    if not isinstance(hex_color, str):
+        raise TypeError("hex_color must be a string")
+    
     hex_color = hex_color.lstrip('#')  # Remove '#' if present
+    if len(hex_color) != 6:
+        raise ValueError("hex_color must be a 6-character string representing RGB hex color")
+
     # Convert hex to BGR
-    b = int(hex_color[0:2], 16)
-    g = int(hex_color[2:4], 16)
-    r = int(hex_color[4:6], 16)
-    return (b, g, r)
+    return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
 
 
 def create_frame(width, height, fill, opacity):
@@ -104,106 +106,69 @@ def order_items_by_zindex(texts, images):
     return ordered_items
 
 
-def text_to_image(text, font_path, font_size, text_color=(255, 255, 255), bg_color=(0, 0, 0, 0)):
-    # Load the custom font
-    font = ImageFont.truetype(font_path, font_size)
-    
-    # Create an image with transparent background
-    image = Image.new("RGBA", font.getsize(text), bg_color)
-    draw = ImageDraw.Draw(image)
-    
-    # Draw the text
-    draw.text((0, 0), text, font=font, fill=text_color)
-    
-    return image
+def get_files_dict():
+    files_dict = {}
+    folder_path = os.path.join(os.path.dirname(__file__), '..', 'utils', 'fonts')
+    for file_name in os.listdir(folder_path):
+        if os.path.isfile(os.path.join(folder_path, file_name)):
+            file_name_without_ext, file_ext = os.path.splitext(file_name)
+            files_dict[file_name_without_ext] = file_name
+    return files_dict
 
-def overlay_text_image(frame, text_img_cv2, x, y):
-    # Text image dimensions
-    img_height, img_width = text_img_cv2.shape[:2]
+dict_of_files = get_files_dict()
 
-    # Frame dimensions
+def draw_text(frame, item):
+    x, y = (item.x, item.y)
+    text = item.text
+    font_scale = item.scaleX if item.scaleX else 1
+    font_name = item.fontFamily.replace("'", "")
+    color = item.fill
     frame_height, frame_width = frame.shape[:2]
+    print("fname:",font_name)
+    path_name_font = dict_of_files.get(font_name)
 
-    # Calculate the overlay region, taking clipping into account
-    start_x, start_y = max(x, 0), max(y, 0)
-    end_x, end_y = min(x + img_width, frame_width), min(y + img_height, frame_height)
-
-    # Calculate the region of interest in the text image considering the frame boundaries
-    text_img_roi = text_img_cv2[max(0, -y):end_y-y, max(0, -x):end_x-x]
-
-    if start_x < end_x and start_y < end_y:  # Check if there's an overlap
-        frame[start_y:end_y, start_x:end_x] = text_img_roi
-
-    return frame
-
-def pil_to_cv2(pil_image):
-    # Convert a PIL Image to an OpenCV image
-    open_cv_image = np.array(pil_image)
-    # Convert RGB to BGR
-    return open_cv_image[:, :, ::-1].copy()
-
-def overlay_with_transparency(frame, overlay, position):
-    x, y = position
-    overlay_height, overlay_width = overlay.shape[:2]
-
-    # Background and foreground extraction for overlay
-    bg = frame[y:y+overlay_height, x:x+overlay_width]
-    alpha_mask = overlay[:, :, 3] / 255.0
-    overlay = cv2.cvtColor(overlay[:, :, :3], cv2.COLOR_RGBA2BGR)
-
-    # Ensure alpha mask dimensions match
-    alpha_mask = alpha_mask[:,:,np.newaxis]
-
-    # Combine background and foreground based on alpha mask
-    combined = bg * (1 - alpha_mask) + overlay * alpha_mask
-    frame[y:y+overlay_height, x:x+overlay_width] = combined.astype(np.uint8)
-
-def draw_text_intelligently(frame, text, position, font, font_scale, color, thickness, font_path=None):
-    x, y = position
-    frame_height, frame_width = frame.shape[:2]
-
+    if path_name_font:
+        font_path = os.path.join(os.path.dirname(__file__), '..', 'utils', 'fonts', path_name_font )
+        print("fpath",font_path)
+    else:
+        font_path = None   
     # Convert color from hex to BGR
     color_bgr = hex_to_bgr(color)
 
-    # Estimate text size with OpenCV
-    (text_width, text_height), baseline = cv2.getTextSize(text, font, font_scale, thickness)
-    text_bottom_right_x = x + text_width
-    text_bottom_right_y = y + text_height
+    if not font_path:
+        current_dir = os.path.dirname(__file__)  # Get the directory where the script is located
+        font_path = os.path.join(current_dir, '..', 'utils', 'fonts', 'roboto_regular.ttf')
 
-    # Check if text fits within frame boundaries
-    if 0 <= x <= frame_width and 0 <= y <= frame_height and text_bottom_right_x <= frame_width and text_bottom_right_y <= frame_height:
-        # Text fits within frame, use OpenCV's putText
-        print(text, x, y, font, font_scale, color_bgr, thickness)
-        cv2.putText(frame, text, (int(x), int(y + text_height)), font, 1, color_bgr, thickness)
-    else:
-        # Text exceeds frame or custom font needed, check for font_path
-        if not font_path:
-            # Define a default font if no custom font path is provided
-            # This is a fallback scenario; you might need to ensure you have a reasonable default font
-            current_dir = os.path.dirname(__file__)  # Get the directory where the script is located
-            font_path = os.path.join(current_dir, '..', 'utils', 'fonts', 'roboto_regular.ttf')
-
-            
-        # Use PIL to render text as an image for more complex handling
-        pil_text_image = text_to_image(text, font_path, int(font_scale * 20), color, (0, 0, 0, 0))  # Adjust scale as needed
-        cv_text_image = pil_to_cv2(pil_text_image)
-        overlay_with_transparency(frame, cv_text_image, (max(x, 0), max(y, 0)))
-
+    cv2.imwrite('frame_before.jpg', frame)
+    frame = draw_text_with_pil(frame, text, (x, y), font_path, 20, color_bgr)
+    cv2.imwrite('frame_after.jpg', frame)
     return frame
 
 
+def draw_text_with_pil(frame, text, position, font_path, font_size, color):
+    # Convert the BGR frame to RGB for Pillow
+    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    image = Image.fromarray(frame_rgb)
+    
+   
+    # Ensure the image is in RGBA to handle transparency
+    if image.mode != 'RGBA':
+        image = image.convert('RGBA')
+    
+    draw = ImageDraw.Draw(image)
+    font = ImageFont.truetype(font_path, font_size)
+    draw.text(position, text, fill=(0,0,0), font=font)
+    image.save('test2.png')
+    
+    cv2_im_processed = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+    return cv2_im_processed
+
 # Decode base64 to image
 def decode_base64_to_image(data_url):
-    # Find and remove the MIME type and encoding header (e.g., "data:image/png;base64,")
     header, base64_data = re.split(',', data_url, maxsplit=1)
-    
-    # Decode the base64 string
     img_data = base64.b64decode(base64_data)
-    
-    # Convert the bytes data to a NumPy array
+
     np_arr = np.frombuffer(img_data, dtype=np.uint8)
-    
-    # Decode the NumPy array into an image
     img = cv2.imdecode(np_arr, cv2.IMREAD_UNCHANGED)
     
     return img
@@ -292,16 +257,14 @@ def draw_image(frame, item):
     img = decode_base64_to_image(item.image)
     draw_image_with_clipping(frame, img, item)
 
-def draw_text(frame, item):
-    draw_text_intelligently(frame, item.text, (item.x, item.y), cv2.FONT_HERSHEY_SIMPLEX, 1, item.fill, 1, None)
-
 
 def draw_items_on_frame(frame, items):
+    print(items)
     for item in items:
         if item.type == 'text':
-            draw_text(frame, item)
+            frame = draw_text(frame, item)
         elif item.type == 'image':
-            draw_image(frame, item)
+            frame = draw_image(frame, item)
         else:
             print(f"No draw function for type: {item.type}")
 

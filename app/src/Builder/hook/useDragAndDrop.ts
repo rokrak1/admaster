@@ -102,7 +102,7 @@ const useDragAndDrop = (
             0
           ),
         height: data.height,
-        fill: "#00000",
+        fill: "#333333",
         x: position.x,
         y: position.y,
         fontSize: data.fontSize,
@@ -128,7 +128,7 @@ const useDragAndDrop = (
       attrs: {
         name: "label-target",
         "data-item-type": "shape",
-        fill: "#00000",
+        fill: "#333333",
         x: position.x,
         y: position.y,
         width,
@@ -154,7 +154,7 @@ const useDragAndDrop = (
         "data-item-type": "icon",
         width: 100,
         height: 100,
-        fill: "#00000",
+        fill: "#000000",
         x: position.x,
         y: position.y,
         icon: data.icon,
@@ -181,7 +181,7 @@ const useDragAndDrop = (
       attrs: {
         name: "label-target",
         "data-item-type": "line",
-        stroke: "#00000",
+        stroke: "#000000",
         x: position.x,
         y: position.y,
         width: 100,

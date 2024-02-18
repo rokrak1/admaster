@@ -11,6 +11,300 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300&family=Noto+Serif+TC:wght@300&display=swap");
 /* vietnamese font */
 @import url("https://fonts.googleapis.com/css2?family=Anton&family=Dancing+Script:wght@500&family=Inconsolata:wght@300&family=Open+Sans&family=Playfair+Display:ital@1&family=Roboto+Mono:wght@300&display=swap");
+@font-face {
+  font-family: 'A25-SQUANOVA';
+  src: url('../public/assets/fonts/A25-SQUANOVA.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Abeganshi';
+  src: url('../public/assets/fonts/Abeganshi.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Aero';
+  src: url('../public/assets/fonts/Aero.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Agency_0';
+  src: url('../public/assets/fonts/Agency_0.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Akira Expanded Demo';
+  src: url('../public/assets/fonts/Akira Expanded Demo.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'American Captain';
+  src: url('../public/assets/fonts/American Captain.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'ApexMk2-Regular';
+  src: url('../public/assets/fonts/ApexMk2-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Aquire';
+  src: url('../public/assets/fonts/Aquire.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'ArialNova';
+  src: url('../public/assets/fonts/ArialNova.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Azonix';
+  src: url('../public/assets/fonts/Azonix.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'BebasNeue';
+  src: url('../public/assets/fonts/BebasNeue.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'BEBAS___';
+  src: url('../public/assets/fonts/BEBAS___.TTF') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'blowbrush';
+  src: url('../public/assets/fonts/blowbrush.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Burbank Big Condensed Bold';
+  src: url('../public/assets/fonts/Burbank Big Condensed Bold.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Carnevalee Freakshow';
+  src: url('../public/assets/fonts/Carnevalee Freakshow.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Chosence Bold';
+  src: url('../public/assets/fonts/Chosence Bold.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Damages';
+  src: url('../public/assets/fonts/Damages.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Demonized';
+  src: url('../public/assets/fonts/Demonized.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Dry Brush';
+  src: url('../public/assets/fonts/Dry Brush.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Evogria';
+  src: url('../public/assets/fonts/Evogria.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Geizer';
+  src: url('../public/assets/fonts/Geizer.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Geomanist-Black';
+  src: url('../public/assets/fonts/Geomanist-Black.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Gobold Extra1';
+  src: url('../public/assets/fonts/Gobold Extra1.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Gobold Extra2';
+  src: url('../public/assets/fonts/Gobold Extra2.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Gobold High';
+  src: url('../public/assets/fonts/Gobold High.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Gobold Lowplus';
+  src: url('../public/assets/fonts/Gobold Lowplus.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Gobold Regular';
+  src: url('../public/assets/fonts/Gobold Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Gobold Uplow';
+  src: url('../public/assets/fonts/Gobold Uplow.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'GoshaSans-Regular';
+  src: url('../public/assets/fonts/GoshaSans-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'GRIFTERÔäó+Bold';
+  src: url('../public/assets/fonts/GRIFTERÔäó+Bold.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'HeadlinerNo';
+  src: url('../public/assets/fonts/HeadlinerNo.45 DEMO.ttf') format('null');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'JUSTICE LEAGUE';
+  src: url('../public/assets/fonts/JUSTICE LEAGUE.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'LemonMilk';
+  src: url('../public/assets/fonts/LemonMilk.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'MCF_Krechet';
+  src: url('../public/assets/fonts/MCF_Krechet.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Montserrat-Bold';
+  src: url('../public/assets/fonts/Montserrat-Bold.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'MonumentExtended-Regular';
+  src: url('../public/assets/fonts/MonumentExtended-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Morganite-Black';
+  src: url('../public/assets/fonts/Morganite-Black.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Morganite-Medium';
+  src: url('../public/assets/fonts/Morganite-Medium.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Nau Sea';
+  src: url('../public/assets/fonts/Nau Sea.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Nexa Bold';
+  src: url('../public/assets/fonts/Nexa Bold.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Peace Sans Webfont';
+  src: url('../public/assets/fonts/Peace Sans Webfont.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Peace Sans';
+  src: url('../public/assets/fonts/Peace Sans.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Poppins-Black';
+  src: url('../public/assets/fonts/Poppins-Black.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Poppins-Regular';
+  src: url('../public/assets/fonts/Poppins-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Road_Rage';
+  src: url('../public/assets/fonts/Road_Rage.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'STRRETCH SANS FREE';
+  src: url('../public/assets/fonts/STRRETCH SANS FREE.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Subspace';
+  src: url('../public/assets/fonts/Subspace.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'the breakdown';
+  src: url('../public/assets/fonts/the breakdown.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'True Lies';
+  src: url('../public/assets/fonts/True Lies.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
 @tailwind base;
 @tailwind components;
