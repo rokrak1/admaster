@@ -20,3 +20,4 @@ python-dotenv
 supabase
 pyjwt
 orjson
+python-multipart
